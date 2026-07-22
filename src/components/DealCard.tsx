@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { PriceBlock } from "@/components/PriceBlock";
 import { buttonClasses } from "@/components/ui/Button";
 import { MERCHANT_LABELS, sectionToPath } from "@/lib/constants";
-import { timeAgo } from "@/lib/utils";
+import { timeAgo, plainExcerpt } from "@/lib/utils";
 
 /**
  * Carte de deal (design-front §5.2).
@@ -16,6 +16,7 @@ import { timeAgo } from "@/lib/utils";
  */
 export function DealCard({ product }: { product: Product }) {
   const href = `/${sectionToPath(product.section)}/${product.slug}`;
+  const excerpt = plainExcerpt(product.description);
 
   return (
     <article className="relative flex flex-col gap-4 rounded-card border border-border bg-surface p-4 shadow-[var(--shadow-card)] transition-[transform,box-shadow,border-color] hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_0_28px_-8px_var(--primary)] sm:flex-row">
@@ -67,17 +68,16 @@ export function DealCard({ product }: { product: Product }) {
           </span>
         </p>
 
-        {product.description && (
-          <p className="line-clamp-2 text-[15px] text-muted">
-            {product.description}
-          </p>
+        {excerpt && (
+          <p className="line-clamp-2 text-[15px] text-muted">{excerpt}</p>
         )}
 
         <div className="mt-auto flex justify-end pt-2">
           <Link
             href={`/go/${product.id}`}
             className={buttonClasses("primary", "md", "relative z-10")}
-            rel="nofollow sponsored"
+            target="_blank"
+            rel="nofollow sponsored noopener noreferrer"
           >
             Voir l&apos;offre
             <ExternalLink className="size-4" aria-hidden />

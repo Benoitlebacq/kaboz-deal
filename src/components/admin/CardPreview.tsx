@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { PriceBlock } from "@/components/PriceBlock";
 import { buttonClasses } from "@/components/ui/Button";
 import { MERCHANT_LABELS } from "@/lib/constants";
+import { plainExcerpt } from "@/lib/utils";
 import type { Marchand } from "@/db/schema";
 
 /** Aperçu en direct de la carte telle qu'elle s'affichera (design-front §6). */
@@ -65,8 +66,10 @@ export function CardPreview({
           </span>
         </p>
 
-        {description && (
-          <p className="line-clamp-2 text-[15px] text-muted">{description}</p>
+        {plainExcerpt(description) && (
+          <p className="line-clamp-2 text-[15px] text-muted">
+            {plainExcerpt(description)}
+          </p>
         )}
 
         <div className="mt-auto flex justify-end pt-2">

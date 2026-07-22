@@ -37,11 +37,13 @@ Hors périmètre du MVP : scraping, comparaison Keepa, descriptions auto par LLM
 - **Drizzle ORM** + **postgres-js** — accès BDD typé.
 - **Supabase Auth** + **@supabase/ssr** — protège `/admin` uniquement.
 - **Inter** (corps) + **Space Grotesk** (titres) + **Orbitron** (logo néon) via
-  `next/font` ; icônes **lucide-react** (logos YouTube/Twitch en SVG inline).
+  `next/font` ; icônes **lucide-react** ; **react-markdown** + **remark-gfm**
+  pour le rendu des descriptions.
 
 Choix structurants :
-- Images = **URL externes collées** (pas de storage). `next.config.ts` autorise
-  tout hôte HTTPS.
+- Images : **photo produit = URL externe collée** ; **images de description =
+  upload vers Supabase Storage** (bucket public `product-images`, insérées en
+  Markdown `![](url)`). `next.config.ts` autorise tout hôte HTTPS.
 - **Écritures admin via Drizzle** (`DATABASE_URL`), pas via la clé service_role.
 - Protection de `/admin` via **`src/proxy.ts`** (convention Next 16 ; l'ancien
   `middleware` est déprécié).
@@ -155,6 +157,17 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Descriptions Markdown + upload d'images
+- Descriptions rendues en **Markdown** (react-markdown/remark-gfm) : titres,
+  listes, gras, **images**. Extrait des cartes nettoyé (plus de syntaxe brute) via
+  `plainExcerpt`.
+- **Upload d'images** de description → **Supabase Storage** (bucket public
+  `product-images` + policy INSERT `authenticated`). Insertion auto du `![](url)`
+  à la position du curseur, avec aperçu live.
+- Onglet de **catégorie active** surligné (composant `SectionNav`, `usePathname`).
+- CTA **« Voir l'offre »** ouvre dans un **nouvel onglet** (`target="_blank"`).
+- Setup Supabase à retenir : bucket `product-images` créé (partagé local+prod).
 
 ### 2026-07-22 — Thème « Synthwave / Outrun »
 - Refonte 80's : nuit violette + grille rétro + horizon cyan, néons

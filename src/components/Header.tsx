@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Search, Tag } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { SectionNav } from "@/components/SectionNav";
 
 /**
  * Header sticky, deux rangées (design-front §5.1).
@@ -51,20 +52,7 @@ export function Header() {
         </div>
 
         {/* Rangée 2 */}
-        <nav className="flex h-12 items-center gap-1 text-sm font-semibold">
-          <Link
-            href="/tech"
-            className="rounded-btn px-3 py-1.5 transition-colors hover:bg-surface-2"
-          >
-            Tech
-          </Link>
-          <Link
-            href="/jeux-video"
-            className="rounded-btn px-3 py-1.5 transition-colors hover:bg-surface-2"
-          >
-            Jeux vidéo
-          </Link>
-        </nav>
+        <SectionNav />
       </div>
     </header>
   );

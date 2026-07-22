@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { Clock, ExternalLink, ImageOff, Info } from "lucide-react";
 import { PriceBlock } from "@/components/PriceBlock";
+import { Markdown } from "@/components/Markdown";
 import { buttonClasses } from "@/components/ui/Button";
 import { getAllActiveProducts, getProductBySlug } from "@/lib/queries";
 import {
@@ -159,7 +160,8 @@ export default async function ProductPage({ params }: { params: Params }) {
             <Link
               href={`/go/${product.id}`}
               className={buttonClasses("primary", "lg", "w-full sm:w-auto")}
-              rel="nofollow sponsored"
+              target="_blank"
+              rel="nofollow sponsored noopener noreferrer"
             >
               Voir l&apos;offre
               <ExternalLink className="size-5" aria-hidden />
@@ -172,9 +174,7 @@ export default async function ProductPage({ params }: { params: Params }) {
       <section className="mt-6 rounded-card border border-border bg-surface p-5">
         <h2 className="mb-3 text-lg font-bold">À propos de ce bon plan</h2>
         {product.description ? (
-          <p className="whitespace-pre-line text-[15px] leading-relaxed">
-            {product.description}
-          </p>
+          <Markdown>{product.description}</Markdown>
         ) : (
           <p className="text-[15px] text-muted">Description à venir.</p>
         )}

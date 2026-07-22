@@ -89,3 +89,31 @@ export function formatDateShort(date: Date | string | null | undefined): string 
     year: "numeric",
   }).format(d);
 }
+
+/**
+ * Convertit une description Markdown en texte simple pour les extraits
+ * (cartes de listing) : retire images, liens, titres, gras… et remplace les
+ * sauts de ligne par des espaces.
+ */
+export function plainExcerpt(
+  md: string | null | undefined,
+  maxLen = 200,
+): string {
+  if (!md) return "";
+  let text = md
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "") // images -> supprimées
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1") // liens -> texte
+    .replace(/`{1,3}([^`]*)`{1,3}/g, "$1") // code inline
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "") // titres
+    .replace(/^\s*>\s?/gm, "") // citations
+    .replace(/^\s*[-*+]\s+/gm, "") // listes à puces
+    .replace(/^\s*\d+\.\s+/gm, "") // listes numérotées
+    .replace(/\*\*([^*]+)\*\*/g, "$1") // gras
+    .replace(/(^|[^*])\*([^*]+)\*/g, "$1$2") // italique *
+    .replace(/_{1,2}([^_]+)_{1,2}/g, "$1") // emphase _
+    .replace(/~~([^~]+)~~/g, "$1") // barré
+    .replace(/\s+/g, " ") // espaces/retours -> espace
+    .trim();
+  if (text.length > maxLen) text = `${text.slice(0, maxLen).trimEnd()}…`;
+  return text;
+}

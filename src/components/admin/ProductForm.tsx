@@ -1,13 +1,21 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { Trash2 } from "lucide-react";
+import {
+  type ChangeEvent,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { ImagePlus, Trash2 } from "lucide-react";
 import type { Product, Marchand, Section } from "@/db/schema";
 import { saveProduct, deleteProduct, type FormState } from "@/app/admin/actions";
 import { Button } from "@/components/ui/Button";
 import { CardPreview } from "@/components/admin/CardPreview";
+import { Markdown } from "@/components/Markdown";
+import { createClient } from "@/lib/supabase/client";
 import { SECTIONS, MERCHANTS } from "@/lib/constants";
-import { slugify, discountPercent } from "@/lib/utils";
+import { slugify, discountPercent, cn } from "@/lib/utils";
 
 function toLocalInput(d: Date | string | null): string {
   if (!d) return "";
@@ -44,6 +52,9 @@ export function ProductForm({ product }: { product?: Product }) {
   const [description, setDescription] = useState(product?.description ?? "");
   const [actif, setActif] = useState(product?.actif ?? true);
   const [misEnAvant, setMisEnAvant] = useState(product?.misEnAvant ?? false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const descRef = useRef<HTMLTextAreaElement>(null);
 
   // Slug auto tant que l'utilisateur ne l'a pas édité manuellement.
   useEffect(() => {
@@ -51,6 +62,50 @@ export function ProductForm({ product }: { product?: Product }) {
   }, [titre, slugTouched]);
 
   const remise = discountPercent(prix, prixBarre);
+
+  // Insère du texte à la position du curseur dans la description.
+  function insertIntoDescription(text: string) {
+    const ta = descRef.current;
+    if (!ta) {
+      setDescription((d) => d + text);
+      return;
+    }
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    setDescription((d) => d.slice(0, start) + text + d.slice(end));
+    requestAnimationFrame(() => {
+      ta.focus();
+      const pos = start + text.length;
+      ta.setSelectionRange(pos, pos);
+    });
+  }
+
+  // Upload d'une image vers Supabase Storage puis insertion du Markdown.
+  async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadError(null);
+    setUploading(true);
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop() || "png";
+      const path = `${crypto.randomUUID()}.${ext}`;
+      const { error } = await supabase.storage
+        .from("product-images")
+        .upload(path, file, { cacheControl: "3600", upsert: false });
+      if (error) throw error;
+      const { data } = supabase.storage
+        .from("product-images")
+        .getPublicUrl(path);
+      insertIntoDescription(`\n\n![capture](${data.publicUrl})\n\n`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "erreur inconnue";
+      setUploadError(`Échec de l'upload : ${msg}`);
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
@@ -195,16 +250,46 @@ export function ProductForm({ product }: { product?: Product }) {
           />
         </label>
 
-        <label className={labelCls}>
-          Description
+        <div className={labelCls}>
+          <div className="flex items-center justify-between">
+            <span>Description (Markdown)</span>
+            <label
+              className={cn(
+                "inline-flex cursor-pointer items-center gap-1 text-sm font-semibold text-primary hover:underline",
+                uploading && "pointer-events-none opacity-60",
+              )}
+            >
+              <ImagePlus className="size-4" aria-hidden />
+              {uploading ? "Upload…" : "Insérer une image"}
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+                disabled={uploading}
+              />
+            </label>
+          </div>
           <textarea
+            ref={descRef}
             name="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            rows={5}
+            rows={6}
+            placeholder="Markdown : **gras**, - listes, ![](url) pour une image…"
             className="rounded-btn border border-border bg-surface-2 p-3 text-fg focus:border-primary"
           />
-        </label>
+          {uploadError && <p className="text-sm text-price">{uploadError}</p>}
+        </div>
+
+        {description && (
+          <div className="rounded-btn border border-border bg-surface-2 p-3">
+            <p className="mb-2 text-xs font-semibold text-muted">
+              Aperçu de la description
+            </p>
+            <Markdown>{description}</Markdown>
+          </div>
+        )}
 
         <div className="flex flex-wrap gap-6">
           <label className="flex items-center gap-2 text-sm font-medium">
