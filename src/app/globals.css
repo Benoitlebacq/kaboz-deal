@@ -1,26 +1,102 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Tokens de couleur (design-front §2). Dark-first : les valeurs par défaut
+ * sont le thème sombre ; [data-theme="light"] bascule en clair.
+ * next-themes pose l'attribut data-theme sur <html>.
+ * RÈGLE : aucune couleur en dur dans les composants -> tout passe par ces vars.
+ */
+:root,
+[data-theme="dark"] {
+  --bg: #1b1e23;
+  --surface: #24282e;
+  --surface-2: #2c3138;
+  --border: #363b43;
+  --text: #f2f3f5;
+  --text-muted: #9aa1a9;
+  --primary: #17b3c9;
+  --primary-hover: #14a0b4;
+  --on-primary: #ffffff;
+  --price: #f5455f;
+  --success: #3ba55d;
+  --hot: #ff5a3c;
+  --shadow-card: 0 0 0 rgba(0, 0, 0, 0);
 }
 
+[data-theme="light"] {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --border: #e2e5ea;
+  --text: #1e232b;
+  --text-muted: #5f6771;
+  --primary: #0e93a8;
+  --primary-hover: #0b7d90;
+  --on-primary: #ffffff;
+  --price: #e02b45;
+  --success: #2f9a51;
+  --hot: #f04c2f;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/*
+ * Expose les tokens à Tailwind (utilitaires bg-*, text-*, border-*, rounded-*).
+ * `inline` conserve la référence var() -> résolue au runtime selon data-theme.
+ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-price: var(--price);
+  --color-success: var(--success);
+  --color-hot: var(--hot);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Rayons (identiques dans les deux thèmes) -> rounded-card, rounded-btn, ... */
+@theme {
+  --radius-card: 12px;
+  --radius-btn: 10px;
+  --radius-badge: 6px;
+  --radius-pill: 999px;
+}
+
+html {
+  color-scheme: dark;
+}
+[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Focus clavier visible (a11y AA). */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect de prefers-reduced-motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

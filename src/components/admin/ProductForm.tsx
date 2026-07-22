@@ -1,0 +1,263 @@
+"use client";
+
+import { useActionState, useEffect, useState } from "react";
+import { Trash2 } from "lucide-react";
+import type { Product, Marchand, Section } from "@/db/schema";
+import { saveProduct, deleteProduct, type FormState } from "@/app/admin/actions";
+import { Button } from "@/components/ui/Button";
+import { CardPreview } from "@/components/admin/CardPreview";
+import { SECTIONS, MERCHANTS } from "@/lib/constants";
+import { slugify, discountPercent } from "@/lib/utils";
+
+function toLocalInput(d: Date | string | null): string {
+  if (!d) return "";
+  const date = new Date(d);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate(),
+  )}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+const field =
+  "h-10 rounded-btn border border-border bg-surface-2 px-3 text-fg focus:border-primary";
+const labelCls = "flex flex-col gap-1 text-sm font-medium";
+
+export function ProductForm({ product }: { product?: Product }) {
+  const isEdit = Boolean(product);
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    saveProduct,
+    {},
+  );
+
+  const [titre, setTitre] = useState(product?.titre ?? "");
+  const [slug, setSlug] = useState(product?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(isEdit);
+  const [section, setSection] = useState<Section>(product?.section ?? "tech");
+  const [sousCategorie, setSousCategorie] = useState(product?.sousCategorie ?? "");
+  const [marchand, setMarchand] = useState<Marchand>(product?.marchand ?? "amazon");
+  const [lienAffilie, setLienAffilie] = useState(product?.lienAffilie ?? "");
+  const [imageUrl, setImageUrl] = useState(product?.imageUrl ?? "");
+  const [prix, setPrix] = useState(product?.prix ?? "");
+  const [prixBarre, setPrixBarre] = useState(product?.prixBarre ?? "");
+  const [devise] = useState(product?.devise ?? "EUR");
+  const [dateFin, setDateFin] = useState(toLocalInput(product?.dateFin ?? null));
+  const [description, setDescription] = useState(product?.description ?? "");
+  const [actif, setActif] = useState(product?.actif ?? true);
+  const [misEnAvant, setMisEnAvant] = useState(product?.misEnAvant ?? false);
+
+  // Slug auto tant que l'utilisateur ne l'a pas édité manuellement.
+  useEffect(() => {
+    if (!slugTouched) setSlug(slugify(titre));
+  }, [titre, slugTouched]);
+
+  const remise = discountPercent(prix, prixBarre);
+
+  return (
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+      {/* Formulaire */}
+      <form action={formAction} className="flex flex-col gap-4">
+        {isEdit && <input type="hidden" name="id" value={product!.id} />}
+
+        {state.error && (
+          <p className="rounded-badge border border-price/40 bg-price/10 px-3 py-2 text-sm text-price">
+            {state.error}
+          </p>
+        )}
+
+        <label className={labelCls}>
+          Section *
+          <select
+            name="section"
+            value={section}
+            onChange={(e) => setSection(e.target.value as Section)}
+            className={field}
+          >
+            {SECTIONS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className={labelCls}>
+          Sous-catégorie
+          <input
+            name="sousCategorie"
+            value={sousCategorie}
+            onChange={(e) => setSousCategorie(e.target.value)}
+            placeholder="écran, GPU, CPU…"
+            className={field}
+          />
+        </label>
+
+        <label className={labelCls}>
+          Marchand *
+          <select
+            name="marchand"
+            value={marchand}
+            onChange={(e) => setMarchand(e.target.value as Marchand)}
+            className={field}
+          >
+            {MERCHANTS.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className={labelCls}>
+          Lien d&apos;affiliation *
+          <input
+            name="lienAffilie"
+            value={lienAffilie}
+            onChange={(e) => setLienAffilie(e.target.value)}
+            placeholder="https://amzn.to/4pvTotA"
+            className={field}
+          />
+        </label>
+
+        <label className={labelCls}>
+          Titre *
+          <input
+            name="titre"
+            value={titre}
+            onChange={(e) => setTitre(e.target.value)}
+            required
+            className={field}
+          />
+        </label>
+
+        <label className={labelCls}>
+          Slug (généré, éditable)
+          <input
+            name="slug"
+            value={slug}
+            onChange={(e) => {
+              setSlugTouched(true);
+              setSlug(e.target.value);
+            }}
+            className={field}
+          />
+        </label>
+
+        <label className={labelCls}>
+          URL de l&apos;image
+          <input
+            name="imageUrl"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="https://…/image.jpg"
+            className={field}
+          />
+        </label>
+
+        <div className="grid grid-cols-2 gap-4">
+          <label className={labelCls}>
+            Prix
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="prix"
+              value={prix}
+              onChange={(e) => setPrix(e.target.value)}
+              className={field}
+            />
+          </label>
+          <label className={labelCls}>
+            Prix barré
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              name="prixBarre"
+              value={prixBarre}
+              onChange={(e) => setPrixBarre(e.target.value)}
+              className={field}
+            />
+          </label>
+        </div>
+        <input type="hidden" name="devise" value={devise} />
+        {remise !== null && (
+          <p className="text-sm text-success">Remise calculée : -{remise}%</p>
+        )}
+
+        <label className={labelCls}>
+          Date de fin (optionnelle)
+          <input
+            type="datetime-local"
+            name="dateFin"
+            value={dateFin}
+            onChange={(e) => setDateFin(e.target.value)}
+            className={field}
+          />
+        </label>
+
+        <label className={labelCls}>
+          Description
+          <textarea
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={5}
+            className="rounded-btn border border-border bg-surface-2 p-3 text-fg focus:border-primary"
+          />
+        </label>
+
+        <div className="flex flex-wrap gap-6">
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="actif"
+              checked={actif}
+              onChange={(e) => setActif(e.target.checked)}
+            />
+            Actif (visible)
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium">
+            <input
+              type="checkbox"
+              name="misEnAvant"
+              checked={misEnAvant}
+              onChange={(e) => setMisEnAvant(e.target.checked)}
+            />
+            À la une
+          </label>
+        </div>
+
+        <div className="flex items-center gap-3 pt-2">
+          <Button type="submit" size="lg" disabled={pending}>
+            {pending ? "Enregistrement…" : "Enregistrer"}
+          </Button>
+        </div>
+      </form>
+
+      {/* Aperçu live + suppression */}
+      <div className="flex flex-col gap-4 lg:sticky lg:top-6 lg:self-start">
+        <p className="text-sm font-semibold text-muted">Aperçu de la carte</p>
+        <CardPreview
+          titre={titre}
+          imageUrl={imageUrl}
+          prix={prix}
+          prixBarre={prixBarre}
+          devise={devise}
+          marchand={marchand}
+          description={description}
+          misEnAvant={misEnAvant}
+        />
+
+        {isEdit && (
+          <form action={deleteProduct} className="mt-4">
+            <input type="hidden" name="id" value={product!.id} />
+            <Button type="submit" variant="danger" size="sm">
+              <Trash2 className="size-4" aria-hidden />
+              Masquer ce produit (soft-delete)
+            </Button>
+          </form>
+        )}
+      </div>
+    </div>
+  );
+}
