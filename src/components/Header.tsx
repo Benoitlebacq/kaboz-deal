@@ -13,12 +13,18 @@ export function Header() {
       <div className="mx-auto w-full max-w-[1240px] px-4">
         {/* Rangée 1 */}
         <div className="flex h-16 items-center gap-4">
-          <Link href="/" className="flex shrink-0 items-center gap-2 font-extrabold">
-            <span className="flex size-8 items-center justify-center rounded-btn bg-primary text-on-primary">
+          <Link
+            href="/"
+            className="flex shrink-0 items-center gap-2 font-display font-bold"
+          >
+            <span className="flex size-8 items-center justify-center rounded-xl text-on-primary shadow-[0_4px_12px_-4px_var(--primary)] [background-image:var(--primary-gradient)]">
               <Tag className="size-5" aria-hidden />
             </span>
             <span className="text-lg">
-              Kaboz<span className="text-primary">Deal</span>
+              Kaboz
+              <span className="bg-clip-text text-transparent [background-image:var(--primary-gradient)]">
+                Deal
+              </span>
             </span>
           </Link>
 

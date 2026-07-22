@@ -23,7 +23,7 @@ Hors périmètre du MVP : scraping, comparaison Keepa, descriptions auto par LLM
 |---|---|
 | Dossier local | `C:\Users\blebacq\Desktop\my-deal` |
 | Repo GitHub | https://github.com/Benoitlebacq/kaboz-deal.git (branche `main`) |
-| Hébergement | Vercel (relié au repo, déploiement auto à chaque push) |
+| Hébergement | Vercel — https://kaboz-deal.vercel.app (déploiement auto à chaque push) |
 | BDD / Auth | Supabase — projet `mcunotccghypxummfdci` (région eu-west-1) ✅ branché |
 | Domaine | Cloudflare Registrar (prévu, pas encore acheté) |
 
@@ -36,7 +36,8 @@ Hors périmètre du MVP : scraping, comparaison Keepa, descriptions auto par LLM
 - **next-themes** — clair/sombre via `data-theme`, **sombre par défaut**.
 - **Drizzle ORM** + **postgres-js** — accès BDD typé.
 - **Supabase Auth** + **@supabase/ssr** — protège `/admin` uniquement.
-- **lucide-react** (icônes), **Inter** (`next/font`).
+- **Inter** (corps) + **Space Grotesk** (titres/logo) via `next/font` ; icônes
+  **lucide-react** (logos YouTube/Twitch en SVG inline, retirés de lucide).
 
 Choix structurants :
 - Images = **URL externes collées** (pas de storage). `next.config.ts` autorise
@@ -87,12 +88,23 @@ drizzle/                      migrations SQL
 Détail des URLs : `/tech`, `/jeux-video`, `/{section}/{slug}` (la section en
 base `jeux_video` s'écrit `jeux-video` dans l'URL — voir `lib/constants.ts`).
 
-## 6. Design (résumé)
+## 6. Design — thème « Voltage »
 
-Tokens couleur clair/sombre dans `src/app/globals.css`, mappés sur Tailwind via
-`@theme`. **Aucune couleur en dur** dans les composants (`bg-surface`, `text-fg`,
-`text-muted`, `bg-primary`, `text-price`, `bg-success`, `bg-hot`, `rounded-card`…).
-Réf. complète : `Downloads/design-front.md` (DA inspirée de Dealabs, éditoriale).
+Identité **tech/gaming électrique** (on a quitté l'ADN Dealabs teal/gris). Tokens
+clair/sombre dans `src/app/globals.css`, mappés sur Tailwind via `@theme` —
+**aucune couleur en dur** dans les composants (`bg-surface`, `text-fg`, `bg-primary`,
+`text-price`, `bg-success`, `bg-hot`, `rounded-*`…).
+
+- **Violet électrique** en primaire ; **CTA en dégradé violet→fuchsia** + halo
+  (classe `.cta-gradient` ; var `--primary-gradient`).
+- Fonds **cosmiques** (noir violacé en sombre, lilas clair en clair). Sombre par défaut.
+- Accents : prix **corail-rose**, remises **vert menthe**, « à la une » **ambre**.
+- Formes : **boutons en pilule** (`rounded-full`), cartes 16px, badges en pastilles.
+- Typo : titres/logo en **Space Grotesk**, corps en **Inter**.
+- **Sticky footer** (body `flex flex-col` + main `flex-1`) : pas de blanc sous le footer.
+- Footer : liens **YouTube/Twitch** aux couleurs de marque ; pas de lien admin.
+
+Réf. d'origine (patterns d'UI, désormais recolorée) : `Downloads/design-front.md`.
 
 ## 7. Commandes utiles
 
@@ -115,33 +127,53 @@ Fichier `.env.local` (local, non versionné) — modèle dans `.env.example` :
 
 ## 9. État actuel
 
-### ✅ Fait
-- Architecture complète scaffoldée, build OK, vérifiée au navigateur.
-- Poussée sur GitHub `main` → Vercel déploie automatiquement.
-- Design system clair/sombre, composants, routes publiques + fiche produit SEO,
-  `/go/[id]`, sitemap/robots, backoffice `/admin` (login + CRUD + aperçu live).
-- **Supabase branché en local** : `.env.local` rempli (DATABASE_URL pooler 6543,
-  URL, clé publishable), migration appliquée (table `products` créée), utilisateur
-  admin créé dans Supabase Auth. Circuit vérifié : home lit la base, `/admin`
-  protégé (redirige vers login).
+### ✅ Fait — MVP en ligne et fonctionnel
+- Architecture complète, build OK, déployée sur Vercel (https://kaboz-deal.vercel.app).
+- Supabase branché **en local ET en prod** (même base) : table `products` migrée,
+  utilisateur admin créé dans Supabase Auth.
+- Variables d'env renseignées sur Vercel ; site en ligne **fonctionnel** et
+  `/admin` **protégé** (redirige vers login).
+- **Circuit complet validé** : création d'un produit via l'admin → visible sur
+  les pages publiques.
 
-### ⏳ À faire (pour rendre le site fonctionnel)
-1. Renseigner les **variables d'env sur Vercel** (DATABASE_URL, NEXT_PUBLIC_SUPABASE_URL,
-   NEXT_PUBLIC_SUPABASE_ANON_KEY = clé publishable, NEXT_PUBLIC_SITE_URL) + redeploy.
-   ⚠️ Tant que ce n'est pas fait, `/admin` du site déployé n'est pas protégé.
-2. Ajouter les premiers produits via `/admin`.
-3. Pousser les fichiers de doc + `drizzle.config.ts` (chargement `.env.local`) sur GitHub.
+### ⚠️ Workflow contenu (important)
+Gérer les produits depuis l'**admin EN LIGNE** (`kaboz-deal.vercel.app/admin`) :
+c'est lui qui rafraîchit le cache des pages publiques via `revalidatePath()`.
+L'admin **local** écrit dans la même base mais ne rafraîchit que le cache local
+(la prod ne se met à jour qu'au bout d'1h, ou via un produit enregistré en ligne).
 
-### 🔭 Plus tard (hors MVP)
-Descriptions auto par LLM · cron vérif prix/dispo (Amazon Creators API, Keepa) ·
-table `price_history` + graphes · sous-catégories & filtres · recherche (barre du
-header non branchée pour l'instant) · domaine Cloudflare.
+### 🔭 Prochaines pistes
+- Domaine perso `kaboz-deal.com` (Cloudflare) branché sur Vercel.
+- Filtres & sous-catégories ; brancher la barre de recherche du header.
+- Descriptions auto par LLM ; cron vérif prix/dispo (Amazon Creators API, Keepa) ;
+  table `price_history` + graphes d'évolution.
 
 ---
 
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Refonte design « Voltage »
+- Nouvelle DA : violet électrique, CTA en dégradé, fonds cosmiques, boutons pilule,
+  titres Space Grotesk. Remplace le look Dealabs teal.
+- Footer : liens YouTube/Twitch (SVG aux couleurs de marque), lien admin retiré,
+  hauteur réduite + sticky footer (plus de blanc sous le footer).
+- Développé sur `feat/new-design`, validé, puis mergé sur `main` (déploiement prod).
+
+### 2026-07-22 — MVP en ligne validé 🎉
+- 1er produit créé et visible sur la home publique en ligne.
+- Circuit complet fonctionnel de bout en bout (local + prod). MVP opérationnel.
+
+### 2026-07-22 — Site en ligne fonctionnel
+- Env vars renseignées sur Vercel, redeploy OK.
+- Vérifié en ligne : site accessible, `/admin` protégé (redirige vers login).
+- URL prod : https://kaboz-deal.vercel.app
+- Note ISR : `revalidatePath()` ne rafraîchit que le cache du serveur où l'action
+  tourne. Un produit créé via l'admin LOCAL ne rafraîchit PAS le cache de prod →
+  gérer les produits depuis l'admin EN LIGNE pour que les pages publiques se
+  mettent à jour (même base Supabase partagée). Sinon, attendre le revalidate (1h)
+  ou redéployer.
 
 ### 2026-07-22 — Branchement Supabase (local)
 - Projet Supabase créé (`mcunotccghypxummfdci`, eu-west-1).

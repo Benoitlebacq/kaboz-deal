@@ -18,7 +18,7 @@ export function ThemeToggle() {
       type="button"
       aria-label={isDark ? "Passer en clair" : "Passer en sombre"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="inline-flex size-10 items-center justify-center rounded-btn border border-border bg-surface text-fg transition-colors hover:bg-surface-2"
+      className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-surface text-fg transition-colors hover:bg-surface-2"
     >
       {mounted ? (
         isDark ? (

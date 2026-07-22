@@ -1,42 +1,44 @@
 @import "tailwindcss";
 
 /*
- * Tokens de couleur (design-front §2). Dark-first : les valeurs par défaut
- * sont le thème sombre ; [data-theme="light"] bascule en clair.
- * next-themes pose l'attribut data-theme sur <html>.
+ * === Thème "Voltage" ===
+ * Identité tech/gaming : violet électrique, fonds cosmiques, CTA en dégradé.
+ * Dark-first ; [data-theme="light"] bascule en clair.
  * RÈGLE : aucune couleur en dur dans les composants -> tout passe par ces vars.
  */
 :root,
 [data-theme="dark"] {
-  --bg: #1b1e23;
-  --surface: #24282e;
-  --surface-2: #2c3138;
-  --border: #363b43;
-  --text: #f2f3f5;
-  --text-muted: #9aa1a9;
-  --primary: #17b3c9;
-  --primary-hover: #14a0b4;
+  --bg: #0d0c14;
+  --surface: #17141f;
+  --surface-2: #221d2e;
+  --border: #2c2740;
+  --text: #f4f2fb;
+  --text-muted: #9a94b0;
+  --primary: #8b5cf6;
+  --primary-hover: #a78bfa;
   --on-primary: #ffffff;
-  --price: #f5455f;
-  --success: #3ba55d;
-  --hot: #ff5a3c;
-  --shadow-card: 0 0 0 rgba(0, 0, 0, 0);
+  --price: #ff5c8a;
+  --success: #35d6a4;
+  --hot: #ffb020;
+  --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 [data-theme="light"] {
-  --bg: #f4f5f7;
+  --bg: #f6f5fb;
   --surface: #ffffff;
-  --surface-2: #eef0f3;
-  --border: #e2e5ea;
-  --text: #1e232b;
-  --text-muted: #5f6771;
-  --primary: #0e93a8;
-  --primary-hover: #0b7d90;
+  --surface-2: #efecf8;
+  --border: #e5e1f0;
+  --text: #17141f;
+  --text-muted: #6a6580;
+  --primary: #7c3aed;
+  --primary-hover: #6d28d9;
   --on-primary: #ffffff;
-  --price: #e02b45;
-  --success: #2f9a51;
-  --hot: #f04c2f;
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --price: #e11d5b;
+  --success: #0d9f78;
+  --hot: #d98a00;
+  --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
+  --shadow-card: 0 2px 8px rgba(76, 29, 149, 0.08);
 }
 
 /*
@@ -58,14 +60,15 @@
   --color-hot: var(--hot);
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
 }
 
-/* Rayons (identiques dans les deux thèmes) -> rounded-card, rounded-btn, ... */
+/* Rayons : boutons en pilule, cartes douces, badges en pastilles. */
 @theme {
-  --radius-card: 12px;
-  --radius-btn: 10px;
-  --radius-badge: 6px;
-  --radius-pill: 999px;
+  --radius-card: 16px;
+  --radius-btn: 14px;
+  --radius-badge: 9999px;
+  --radius-pill: 9999px;
 }
 
 html {
@@ -80,6 +83,33 @@ body {
   color: var(--text);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Titres en police display (Space Grotesk), un peu resserrés. */
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+/*
+ * CTA signature : fond dégradé violet->fuchsia + halo.
+ * Utilisé par la variante "primary" du Button (donc aussi sur les liens CTA).
+ */
+.cta-gradient {
+  background-image: var(--primary-gradient);
+  color: var(--on-primary);
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--primary) 55%, transparent);
+  transition:
+    filter 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+.cta-gradient:hover {
+  filter: brightness(1.08) saturate(1.05);
+  box-shadow: 0 10px 26px -6px color-mix(in srgb, var(--primary) 72%, transparent);
 }
 
 /* Focus clavier visible (a11y AA). */

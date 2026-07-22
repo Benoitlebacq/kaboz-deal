@@ -5,12 +5,12 @@ export type ButtonVariant = "primary" | "outline" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
-  "inline-flex items-center justify-center gap-2 font-semibold rounded-btn " +
+  "inline-flex items-center justify-center gap-2 font-semibold rounded-full " +
   "transition-colors disabled:opacity-50 disabled:pointer-events-none cursor-pointer " +
   "focus-visible:outline-2 focus-visible:outline-offset-2";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-on-primary hover:bg-primary-hover",
+  primary: "cta-gradient",
   outline: "border border-border bg-surface text-fg hover:bg-surface-2",
   ghost: "text-fg hover:bg-surface-2",
   danger: "bg-price text-white hover:opacity-90",
