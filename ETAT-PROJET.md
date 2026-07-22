@@ -36,8 +36,8 @@ Hors périmètre du MVP : scraping, comparaison Keepa, descriptions auto par LLM
 - **next-themes** — clair/sombre via `data-theme`, **sombre par défaut**.
 - **Drizzle ORM** + **postgres-js** — accès BDD typé.
 - **Supabase Auth** + **@supabase/ssr** — protège `/admin` uniquement.
-- **Inter** (corps) + **Space Grotesk** (titres/logo) via `next/font` ; icônes
-  **lucide-react** (logos YouTube/Twitch en SVG inline, retirés de lucide).
+- **Inter** (corps) + **Space Grotesk** (titres) + **Orbitron** (logo néon) via
+  `next/font` ; icônes **lucide-react** (logos YouTube/Twitch en SVG inline).
 
 Choix structurants :
 - Images = **URL externes collées** (pas de storage). `next.config.ts` autorise
@@ -88,23 +88,25 @@ drizzle/                      migrations SQL
 Détail des URLs : `/tech`, `/jeux-video`, `/{section}/{slug}` (la section en
 base `jeux_video` s'écrit `jeux-video` dans l'URL — voir `lib/constants.ts`).
 
-## 6. Design — thème « Voltage »
+## 6. Design — thème « Synthwave / Outrun »
 
-Identité **tech/gaming électrique** (on a quitté l'ADN Dealabs teal/gris). Tokens
-clair/sombre dans `src/app/globals.css`, mappés sur Tailwind via `@theme` —
-**aucune couleur en dur** dans les composants (`bg-surface`, `text-fg`, `bg-primary`,
-`text-price`, `bg-success`, `bg-hot`, `rounded-*`…).
+Identité **80's / synthwave** (nuit néon). Tokens clair/sombre dans
+`src/app/globals.css`, mappés sur Tailwind via `@theme` — **aucune couleur en dur**
+dans les composants (`bg-surface`, `text-fg`, `bg-primary`, `text-price`, …).
 
-- **Violet électrique** en primaire ; **CTA en dégradé violet→fuchsia** + halo
-  (classe `.cta-gradient` ; var `--primary-gradient`).
-- Fonds **cosmiques** (noir violacé en sombre, lilas clair en clair). Sombre par défaut.
-- Accents : prix **corail-rose**, remises **vert menthe**, « à la une » **ambre**.
-- Formes : **boutons en pilule** (`rounded-full`), cartes 16px, badges en pastilles.
-- Typo : titres/logo en **Space Grotesk**, corps en **Inter**.
-- **Sticky footer** (body `flex flex-col` + main `flex-1`) : pas de blanc sous le footer.
-- Footer : liens **YouTube/Twitch** aux couleurs de marque ; pas de lien admin.
+- **Néon magenta** `#ff2e97` en primaire ; **CTA en dégradé coucher de soleil**
+  (magenta→orange) + **halo néon** (`.cta-gradient` ; var `--primary-gradient`).
+- Fond **nuit violette** `#0f0524` + décor (dark) : lueur magenta en haut,
+  **horizon cyan** en bas, **grille rétro** fixée au scroll. Sombre par défaut.
+- Accents néon : prix **cyan** `#21d4fd`, remises **vert** `#2bff88`,
+  « à la une » **orange** `#ff9e00`.
+- Logo façon **enseigne néon** (Orbitron + glow via `.text-neon`) ; lueur néon
+  au survol des cartes.
+- **Light mode** = variante pastel « Miami » (rose crème + magenta/teal).
+- Formes : boutons pilule, cartes 16px, badges pastilles. Sticky footer.
+- Footer : liens **YouTube/Twitch** (couleurs de marque), pas de lien admin.
 
-Réf. d'origine (patterns d'UI, désormais recolorée) : `Downloads/design-front.md`.
+Réf. d'origine (patterns d'UI, recolorée) : `Downloads/design-front.md`.
 
 ## 7. Commandes utiles
 
@@ -153,6 +155,12 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Thème « Synthwave / Outrun »
+- Refonte 80's : nuit violette + grille rétro + horizon cyan, néons
+  magenta/cyan/vert/orange, CTA dégradé sunset + glow, logo néon Orbitron,
+  lueur au survol des cartes. Light mode = variante pastel « Miami ».
+- Développé sur `feat/eighty-design`, validé, mergé sur `main` (déploiement prod).
 
 ### 2026-07-22 — Refonte design « Voltage »
 - Nouvelle DA : violet électrique, CTA en dégradé, fonds cosmiques, boutons pilule,

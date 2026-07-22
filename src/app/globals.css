@@ -1,50 +1,45 @@
 @import "tailwindcss";
 
 /*
- * === Thème "Voltage" ===
- * Identité tech/gaming : violet électrique, fonds cosmiques, CTA en dégradé.
- * Dark-first ; [data-theme="light"] bascule en clair.
- * RÈGLE : aucune couleur en dur dans les composants -> tout passe par ces vars.
+ * === Thème "Synthwave / Outrun" (test 80's) ===
+ * Nuit violette, néons magenta/cyan, glows, grille rétro + horizon.
+ * Pensé pour le dark ; le light est une variante pastel "Miami".
  */
 :root,
 [data-theme="dark"] {
-  --bg: #0d0c14;
-  --surface: #17141f;
-  --surface-2: #221d2e;
-  --border: #2c2740;
-  --text: #f4f2fb;
-  --text-muted: #9a94b0;
-  --primary: #8b5cf6;
-  --primary-hover: #a78bfa;
+  --bg: #0f0524;
+  --surface: #1a0b38;
+  --surface-2: #26134f;
+  --border: #3a2168;
+  --text: #f6ecff;
+  --text-muted: #b39ddd;
+  --primary: #ff2e97;
+  --primary-hover: #ff5cb0;
   --on-primary: #ffffff;
-  --price: #ff5c8a;
-  --success: #35d6a4;
-  --hot: #ffb020;
-  --primary-gradient: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
-  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --price: #21d4fd;
+  --success: #2bff88;
+  --hot: #ff9e00;
+  --primary-gradient: linear-gradient(135deg, #ff2e97 0%, #ff7a2f 100%);
+  --shadow-card: 0 0 0 rgba(0, 0, 0, 0);
 }
 
 [data-theme="light"] {
-  --bg: #f6f5fb;
+  --bg: #fdf0f6;
   --surface: #ffffff;
-  --surface-2: #efecf8;
-  --border: #e5e1f0;
-  --text: #17141f;
-  --text-muted: #6a6580;
-  --primary: #7c3aed;
-  --primary-hover: #6d28d9;
+  --surface-2: #fbe6f1;
+  --border: #f3c8e0;
+  --text: #2a1a3e;
+  --text-muted: #7a5c86;
+  --primary: #d6238a;
+  --primary-hover: #b81c76;
   --on-primary: #ffffff;
-  --price: #e11d5b;
-  --success: #0d9f78;
-  --hot: #d98a00;
-  --primary-gradient: linear-gradient(135deg, #7c3aed 0%, #c026d3 100%);
-  --shadow-card: 0 2px 8px rgba(76, 29, 149, 0.08);
+  --price: #0092b8;
+  --success: #12a35a;
+  --hot: #e07a00;
+  --primary-gradient: linear-gradient(135deg, #d6238a 0%, #f2681f 100%);
+  --shadow-card: 0 2px 10px rgba(214, 35, 138, 0.1);
 }
 
-/*
- * Expose les tokens à Tailwind (utilitaires bg-*, text-*, border-*, rounded-*).
- * `inline` conserve la référence var() -> résolue au runtime selon data-theme.
- */
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -61,9 +56,9 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-retro: var(--font-orbitron), var(--font-space-grotesk), sans-serif;
 }
 
-/* Rayons : boutons en pilule, cartes douces, badges en pastilles. */
 @theme {
   --radius-card: 16px;
   --radius-btn: 14px;
@@ -79,47 +74,86 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background-color: var(--bg);
   color: var(--text);
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Titres en police display (Space Grotesk), un peu resserrés. */
-h1,
-h2,
-h3,
-h4 {
-  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  letter-spacing: -0.015em;
+/* Fond synthwave : lueur magenta en haut, horizon cyan en bas, grille rétro. */
+[data-theme="dark"] body {
+  background-image:
+    radial-gradient(
+      ellipse 90% 55% at 50% 0%,
+      color-mix(in srgb, var(--primary) 20%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 70% 45% at 50% 100%,
+      color-mix(in srgb, var(--price) 14%, transparent),
+      transparent 60%
+    ),
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--primary) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--primary) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size:
+    100% 100%,
+    100% 100%,
+    46px 46px,
+    46px 46px;
+  background-attachment: fixed;
 }
 
-/*
- * CTA signature : fond dégradé violet->fuchsia + halo.
- * Utilisé par la variante "primary" du Button (donc aussi sur les liens CTA).
- */
+/* Titres en police display ; lueur néon discrète en dark. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+[data-theme="dark"] h1 {
+  text-shadow: 0 0 18px color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+/* Lueur néon réutilisable (suit la couleur du texte). */
+.text-neon {
+  text-shadow:
+    0 0 6px color-mix(in srgb, currentColor 80%, transparent),
+    0 0 16px color-mix(in srgb, currentColor 45%, transparent);
+}
+
+/* CTA signature : dégradé coucher de soleil + halo néon. */
 .cta-gradient {
   background-image: var(--primary-gradient);
   color: var(--on-primary);
-  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--primary) 55%, transparent);
+  box-shadow:
+    0 0 18px -2px color-mix(in srgb, var(--primary) 65%, transparent),
+    0 6px 16px -8px rgba(0, 0, 0, 0.6);
   transition:
     filter 0.15s ease,
     box-shadow 0.15s ease,
     transform 0.15s ease;
 }
 .cta-gradient:hover {
-  filter: brightness(1.08) saturate(1.05);
-  box-shadow: 0 10px 26px -6px color-mix(in srgb, var(--primary) 72%, transparent);
+  filter: brightness(1.1) saturate(1.1);
+  box-shadow:
+    0 0 28px 0 color-mix(in srgb, var(--primary) 80%, transparent),
+    0 8px 22px -8px rgba(0, 0, 0, 0.6);
 }
 
-/* Focus clavier visible (a11y AA). */
 :focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-radius: 4px;
 }
 
-/* Respect de prefers-reduced-motion. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

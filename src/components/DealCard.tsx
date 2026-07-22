@@ -18,7 +18,7 @@ export function DealCard({ product }: { product: Product }) {
   const href = `/${sectionToPath(product.section)}/${product.slug}`;
 
   return (
-    <article className="relative flex flex-col gap-4 rounded-card border border-border bg-surface p-4 shadow-[var(--shadow-card)] transition-transform hover:-translate-y-0.5 sm:flex-row">
+    <article className="relative flex flex-col gap-4 rounded-card border border-border bg-surface p-4 shadow-[var(--shadow-card)] transition-[transform,box-shadow,border-color] hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-[0_0_28px_-8px_var(--primary)] sm:flex-row">
       {/* Image */}
       <div className="relative h-40 w-full shrink-0 overflow-hidden rounded-card bg-surface-2 sm:h-32 sm:w-40">
         {product.imageUrl ? (

@@ -15,16 +15,14 @@ export function Header() {
         <div className="flex h-16 items-center gap-4">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-2 font-display font-bold"
+            className="flex shrink-0 items-center gap-2 font-retro font-bold tracking-wide"
           >
-            <span className="flex size-8 items-center justify-center rounded-xl text-on-primary shadow-[0_4px_12px_-4px_var(--primary)] [background-image:var(--primary-gradient)]">
+            <span className="flex size-8 items-center justify-center rounded-xl text-on-primary shadow-[0_0_16px_-2px_var(--primary)] [background-image:var(--primary-gradient)]">
               <Tag className="size-5" aria-hidden />
             </span>
-            <span className="text-lg">
-              Kaboz
-              <span className="bg-clip-text text-transparent [background-image:var(--primary-gradient)]">
-                Deal
-              </span>
+            <span className="text-base">
+              <span className="text-fg">KABOZ</span>
+              <span className="text-primary text-neon">DEAL</span>
             </span>
           </Link>
 
