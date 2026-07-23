@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Search, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { SectionNav } from "@/components/SectionNav";
+import { SearchBar } from "@/components/SearchBar";
+import { MobileSearch } from "@/components/MobileSearch";
 
 /**
  * Header sticky, deux rangées (design-front §5.1).
@@ -27,20 +29,10 @@ export function Header() {
             </span>
           </Link>
 
-          <div className="relative hidden flex-1 sm:block">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted"
-              aria-hidden
-            />
-            <input
-              type="search"
-              placeholder="Rechercher un bon plan…"
-              aria-label="Rechercher"
-              className="h-10 w-full rounded-pill border border-border bg-surface-2 pl-9 pr-4 text-sm text-fg placeholder:text-muted focus:border-primary"
-            />
-          </div>
+          <SearchBar />
 
           <div className="ml-auto flex items-center gap-2">
+            <MobileSearch />
             <ThemeToggle />
             <Link
               href="/admin"

@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, ilike, or } from "drizzle-orm";
 import { getDb } from "@/db";
 import { products, type Product, type Section } from "@/db/schema";
 
@@ -59,6 +59,28 @@ export async function getProductById(id: string): Promise<Product | null> {
     .where(eq(products.id, id))
     .limit(1);
   return rows[0] ?? null;
+}
+
+/** Recherche par titre / description / sous-catégorie (produits actifs). */
+export async function searchProducts(q: string): Promise<Product[]> {
+  const db = getDb();
+  if (!db) return [];
+  const term = `%${q}%`;
+  return db
+    .select()
+    .from(products)
+    .where(
+      and(
+        eq(products.actif, true),
+        or(
+          ilike(products.titre, term),
+          ilike(products.description, term),
+          ilike(products.sousCategorie, term),
+        ),
+      ),
+    )
+    .orderBy(desc(products.dateMaj))
+    .limit(50);
 }
 
 /** Admin : tous les produits, y compris inactifs. */

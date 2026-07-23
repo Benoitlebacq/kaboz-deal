@@ -72,6 +72,7 @@ src/
     (public)/                 chrome public (Header + footer)
       page.tsx                accueil (derniers deals + sidebar à la une)
       tech/ · jeux-video/     listings par section
+      recherche/              résultats de recherche (?q=…)
       [section]/[slug]/       fiche produit (metadata unique + JSON-LD Product)
     admin/                    backoffice protégé
       login/ · page.tsx       (liste) · produits/[id]/ (new = création)
@@ -79,7 +80,8 @@ src/
     go/[id]/route.ts          redirection 302 lien affilié (+ compteur clics)
     sitemap.ts · robots.ts    SEO
   components/                 DealCard, Header, PriceBlock, Badge, Button,
-                              FeaturedSidebar, ThemeToggle, SectionFeed…
+                              FeaturedSidebar, ThemeToggle, SectionFeed,
+                              Markdown, SearchBar, MobileSearch, SectionNav…
     admin/                    AdminShell, ProductForm, CardPreview
   db/                         schema.ts + index.ts (client Drizzle paresseux)
   lib/                        utils, constants, queries, supabase/{client,server,middleware}
@@ -148,7 +150,7 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 
 ### 🔭 Prochaines pistes
 - Domaine perso `kaboz-deal.com` (Cloudflare) branché sur Vercel.
-- Filtres & sous-catégories ; brancher la barre de recherche du header.
+- Filtres & sous-catégories.
 - Descriptions auto par LLM ; cron vérif prix/dispo (Amazon Creators API, Keepa) ;
   table `price_history` + graphes d'évolution.
 
@@ -157,6 +159,13 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Recherche fonctionnelle
+- Barre de recherche desktop (`SearchBar`) + recherche mobile (`MobileSearch`,
+  loupe dépliante). Page `/recherche?q=…` : recherche serveur (`ilike`) sur
+  titre + description + sous-catégorie (produits actifs), résultats en cartes +
+  état vide.
+- Nettoyage : branches de features mergées supprimées (local + distant).
 
 ### 2026-07-22 — Descriptions Markdown + upload d'images
 - Descriptions rendues en **Markdown** (react-markdown/remark-gfm) : titres,
