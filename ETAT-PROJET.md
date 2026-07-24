@@ -57,7 +57,7 @@ depuis l'admin ; défauts amazon / eneba / instant_gaming).
 
 Champs : `id` (uuid), `slug` (unique), `titre`, `description`, `section`,
 `sous_categorie`, `marchand`, `lien_affilie`, `image_url`, `prix`, `prix_barre`,
-`devise` (déf. EUR), `date_fin` (nullable, bandeau d'expiration), `date_maj`,
+`devise` (déf. EUR), `date_fin` (nullable ; défaut création +15j ; bandeau d'expiration), `date_maj`,
 `actif` (déf. true), `mis_en_avant` (déf. false), `clicks` (déf. 0),
 `created_at`.
 
@@ -159,6 +159,11 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Expiration par défaut à J+15
+- Nouvelle offre : `date_fin` pré-remplie à publication + 15 jours (form admin),
+  modifiable / vidable. Filet serveur : à la **création**, si vide → +15 jours.
+- (Fait directement sur `main`.)
 
 ### 2026-07-22 — Marchands dynamiques
 - `marchand` : enum → **texte libre** (migration 0001 : cast `::text` + drop du

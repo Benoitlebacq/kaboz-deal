@@ -105,7 +105,13 @@ export async function saveProduct(
   if (prixBarre !== null && (isNaN(Number(prixBarre)) || Number(prixBarre) < 0))
     return { error: "Prix barré invalide." };
 
-  const dateFin = dateFinRaw ? new Date(dateFinRaw) : null;
+  // À la création, expiration par défaut = publication + 15 jours si non fournie.
+  const isCreate = !id || id === "new";
+  const dateFin = dateFinRaw
+    ? new Date(dateFinRaw)
+    : isCreate
+      ? new Date(Date.now() + 15 * 24 * 60 * 60 * 1000)
+      : null;
 
   const values = {
     slug,

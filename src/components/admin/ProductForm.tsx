@@ -87,7 +87,15 @@ export function ProductForm({
   const [prix, setPrix] = useState(product?.prix ?? "");
   const [prixBarre, setPrixBarre] = useState(product?.prixBarre ?? "");
   const [devise] = useState(product?.devise ?? "EUR");
-  const [dateFin, setDateFin] = useState(toLocalInput(product?.dateFin ?? null));
+  // Nouveau produit : expiration pré-remplie à J+15 (modifiable/vidable).
+  // Édition : on garde la date existante (ou vide si aucune).
+  const [dateFin, setDateFin] = useState(
+    toLocalInput(
+      product
+        ? (product.dateFin ?? null)
+        : new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
+    ),
+  );
   const [description, setDescription] = useState(product?.description ?? "");
   const [actif, setActif] = useState(product?.actif ?? true);
   const [misEnAvant, setMisEnAvant] = useState(product?.misEnAvant ?? false);
@@ -297,7 +305,7 @@ export function ProductForm({
         )}
 
         <label className={labelCls}>
-          Date de fin (optionnelle)
+          Date de fin (expiration)
           <input
             type="datetime-local"
             name="dateFin"
@@ -305,6 +313,10 @@ export function ProductForm({
             onChange={(e) => setDateFin(e.target.value)}
             className={field}
           />
+          <span className="text-xs font-normal text-muted">
+            Par défaut : 15 jours après la publication. Modifiable, ou vide pour
+            aucune expiration (en édition).
+          </span>
         </label>
 
         <div className={labelCls}>
