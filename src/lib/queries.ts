@@ -83,6 +83,16 @@ export async function searchProducts(q: string): Promise<Product[]> {
     .limit(50);
 }
 
+/** Liste des marchands distincts déjà utilisés (pour peupler le select admin). */
+export async function getMerchants(): Promise<string[]> {
+  const db = getDb();
+  if (!db) return [];
+  const rows = await db
+    .selectDistinct({ marchand: products.marchand })
+    .from(products);
+  return rows.map((r) => r.marchand).filter(Boolean);
+}
+
 /** Admin : tous les produits, y compris inactifs. */
 export async function getAllProductsAdmin(): Promise<Product[]> {
   const db = getDb();

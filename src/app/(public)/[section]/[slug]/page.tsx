@@ -8,7 +8,7 @@ import { Markdown } from "@/components/Markdown";
 import { buttonClasses } from "@/components/ui/Button";
 import { getAllActiveProducts, getProductBySlug } from "@/lib/queries";
 import {
-  MERCHANT_LABELS,
+  merchantLabel,
   SECTION_LABELS,
   pathToSection,
   sectionToPath,
@@ -39,7 +39,7 @@ export async function generateMetadata({
 
   const description =
     product.description?.slice(0, 160) ??
-    `${product.titre} — bon plan chez ${MERCHANT_LABELS[product.marchand]}.`;
+    `${product.titre} — bon plan chez ${merchantLabel(product.marchand)}.`;
 
   return {
     title: product.titre,
@@ -152,7 +152,7 @@ export default async function ProductPage({ params }: { params: Params }) {
           <p className="text-sm text-muted">
             Dispo. chez{" "}
             <span className="font-semibold text-fg">
-              {MERCHANT_LABELS[product.marchand]}
+              {merchantLabel(product.marchand)}
             </span>
           </p>
 

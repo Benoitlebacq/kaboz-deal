@@ -5,7 +5,7 @@ import type { Product } from "@/db/schema";
 import { Badge } from "@/components/ui/Badge";
 import { PriceBlock } from "@/components/PriceBlock";
 import { buttonClasses } from "@/components/ui/Button";
-import { MERCHANT_LABELS, sectionToPath } from "@/lib/constants";
+import { merchantLabel, sectionToPath } from "@/lib/constants";
 import { timeAgo, plainExcerpt } from "@/lib/utils";
 
 /**
@@ -64,7 +64,7 @@ export function DealCard({ product }: { product: Product }) {
         <p className="text-[13px] text-muted">
           Dispo. chez{" "}
           <span className="font-semibold text-fg">
-            {MERCHANT_LABELS[product.marchand]}
+            {merchantLabel(product.marchand)}
           </span>
         </p>
 

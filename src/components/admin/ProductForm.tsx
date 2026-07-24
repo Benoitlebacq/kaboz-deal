@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
 import { CardPreview } from "@/components/admin/CardPreview";
 import { Markdown } from "@/components/Markdown";
 import { createClient } from "@/lib/supabase/client";
-import { SECTIONS, MERCHANTS } from "@/lib/constants";
+import { SECTIONS, MERCHANTS, merchantLabel } from "@/lib/constants";
 import { slugify, discountPercent, cn } from "@/lib/utils";
 
 function toLocalInput(d: Date | string | null): string {
@@ -30,7 +30,13 @@ const field =
   "h-10 rounded-btn border border-border bg-surface-2 px-3 text-fg focus:border-primary";
 const labelCls = "flex flex-col gap-1 text-sm font-medium";
 
-export function ProductForm({ product }: { product?: Product }) {
+export function ProductForm({
+  product,
+  merchants = [],
+}: {
+  product?: Product;
+  merchants?: string[];
+}) {
   const isEdit = Boolean(product);
   const [state, formAction, pending] = useActionState<FormState, FormData>(
     saveProduct,
@@ -43,6 +49,39 @@ export function ProductForm({ product }: { product?: Product }) {
   const [section, setSection] = useState<Section>(product?.section ?? "tech");
   const [sousCategorie, setSousCategorie] = useState(product?.sousCategorie ?? "");
   const [marchand, setMarchand] = useState<Marchand>(product?.marchand ?? "amazon");
+  const [merchantOptions, setMerchantOptions] = useState<string[]>(() => {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const m of [
+      ...MERCHANTS.map((x) => x.value),
+      ...merchants,
+      ...(product?.marchand ? [product.marchand] : []),
+    ]) {
+      const key = m.toLowerCase();
+      if (m && !seen.has(key)) {
+        seen.add(key);
+        out.push(m);
+      }
+    }
+    return out;
+  });
+  const [newMerchant, setNewMerchant] = useState("");
+
+  // Ajoute un marchand libre aux options et le sélectionne.
+  function addMerchant() {
+    const v = newMerchant.trim();
+    if (!v) return;
+    const existing = merchantOptions.find(
+      (m) => m.toLowerCase() === v.toLowerCase(),
+    );
+    if (existing) {
+      setMarchand(existing);
+    } else {
+      setMerchantOptions((o) => [...o, v]);
+      setMarchand(v);
+    }
+    setNewMerchant("");
+  }
   const [lienAffilie, setLienAffilie] = useState(product?.lienAffilie ?? "");
   const [imageUrl, setImageUrl] = useState(product?.imageUrl ?? "");
   const [prix, setPrix] = useState(product?.prix ?? "");
@@ -146,21 +185,39 @@ export function ProductForm({ product }: { product?: Product }) {
           />
         </label>
 
-        <label className={labelCls}>
-          Marchand *
+        <div className={labelCls}>
+          <span>Marchand *</span>
           <select
             name="marchand"
             value={marchand}
-            onChange={(e) => setMarchand(e.target.value as Marchand)}
+            onChange={(e) => setMarchand(e.target.value)}
             className={field}
           >
-            {MERCHANTS.map((m) => (
-              <option key={m.value} value={m.value}>
-                {m.label}
+            {merchantOptions.map((m) => (
+              <option key={m} value={m}>
+                {merchantLabel(m)}
               </option>
             ))}
           </select>
-        </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={newMerchant}
+              onChange={(e) => setNewMerchant(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addMerchant();
+                }
+              }}
+              placeholder="Ajouter un marchand (ex. Fnac)"
+              className={cn(field, "flex-1")}
+            />
+            <Button type="button" variant="outline" onClick={addMerchant}>
+              Ajouter
+            </Button>
+          </div>
+        </div>
 
         <label className={labelCls}>
           Lien d&apos;affiliation *

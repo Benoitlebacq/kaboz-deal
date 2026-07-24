@@ -15,11 +15,8 @@ import {
  * (voir sectionToPath/pathToSection dans src/lib/constants.ts).
  */
 export const sectionEnum = pgEnum("section", ["tech", "jeux_video"]);
-export const marchandEnum = pgEnum("marchand", [
-  "amazon",
-  "eneba",
-  "instant_gaming",
-]);
+// `marchand` est du texte libre : les marchands peuvent être ajoutés depuis
+// l'admin (les valeurs par défaut vivent dans src/lib/constants.ts).
 
 /**
  * Table unique `products` pour démarrer le MVP.
@@ -32,7 +29,7 @@ export const products = pgTable("products", {
   description: text("description"),
   section: sectionEnum("section").notNull(),
   sousCategorie: text("sous_categorie"),
-  marchand: marchandEnum("marchand").notNull(),
+  marchand: text("marchand").notNull(),
   lienAffilie: text("lien_affilie").notNull(),
   imageUrl: text("image_url"),
   // numeric renvoie une string côté Drizzle : parsée dans lib/utils (toNumber).
@@ -56,4 +53,4 @@ export const products = pgTable("products", {
 export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Section = (typeof sectionEnum.enumValues)[number];
-export type Marchand = (typeof marchandEnum.enumValues)[number];
+export type Marchand = string;

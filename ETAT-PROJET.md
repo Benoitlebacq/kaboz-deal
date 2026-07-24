@@ -52,8 +52,8 @@ Choix structurants :
 
 ## 4. Modèle de données — table `products`
 
-Enums : `section` (`tech` | `jeux_video`), `marchand` (`amazon` | `eneba` |
-`instant_gaming`).
+Enum : `section` (`tech` | `jeux_video`). `marchand` = **texte libre** (ajoutable
+depuis l'admin ; défauts amazon / eneba / instant_gaming).
 
 Champs : `id` (uuid), `slug` (unique), `titre`, `description`, `section`,
 `sous_categorie`, `marchand`, `lien_affilie`, `image_url`, `prix`, `prix_barre`,
@@ -61,7 +61,7 @@ Champs : `id` (uuid), `slug` (unique), `titre`, `description`, `section`,
 `actif` (déf. true), `mis_en_avant` (déf. false), `clicks` (déf. 0),
 `created_at`.
 
-Schéma : `src/db/schema.ts` · Migration générée : `drizzle/0000_*.sql`.
+Schéma : `src/db/schema.ts` · Migrations : `drizzle/` (0000 init, 0001 marchand→texte).
 Évolutions prévues : table `price_history`, `categories`.
 
 ## 5. Arborescence
@@ -159,6 +159,13 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 ## 10. Journal des avancées
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
+
+### 2026-07-22 — Marchands dynamiques
+- `marchand` : enum → **texte libre** (migration 0001 : cast `::text` + drop du
+  type enum). Valeurs existantes préservées.
+- Admin : select des marchands (défauts + existants en base via `getMerchants`)
+  + champ « Ajouter » pour créer un marchand à la volée. Affichage via
+  `merchantLabel` (libellé connu, sinon valeur telle quelle).
 
 ### 2026-07-22 — Recherche fonctionnelle
 - Barre de recherche desktop (`SearchBar`) + recherche mobile (`MobileSearch`,

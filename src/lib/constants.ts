@@ -18,12 +18,17 @@ export function pathToSection(path: string): Section | null {
   return null;
 }
 
-/** Libellés d'affichage des marchands. */
-export const MERCHANT_LABELS: Record<Marchand, string> = {
+/** Libellés d'affichage des marchands par défaut. */
+export const MERCHANT_LABELS: Record<string, string> = {
   amazon: "Amazon",
   eneba: "Eneba",
   instant_gaming: "Instant Gaming",
 };
+
+/** Libellé d'un marchand : joli label si connu, sinon la valeur telle quelle. */
+export function merchantLabel(value: Marchand): string {
+  return MERCHANT_LABELS[value] ?? value;
+}
 
 export const SECTIONS: { value: Section; label: string; path: string }[] = [
   { value: "tech", label: "Tech", path: "tech" },

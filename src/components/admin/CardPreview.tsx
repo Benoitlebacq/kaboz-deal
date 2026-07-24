@@ -4,7 +4,7 @@ import { ExternalLink, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { PriceBlock } from "@/components/PriceBlock";
 import { buttonClasses } from "@/components/ui/Button";
-import { MERCHANT_LABELS } from "@/lib/constants";
+import { merchantLabel } from "@/lib/constants";
 import { plainExcerpt } from "@/lib/utils";
 import type { Marchand } from "@/db/schema";
 
@@ -62,7 +62,7 @@ export function CardPreview({
         <p className="text-[13px] text-muted">
           Dispo. chez{" "}
           <span className="font-semibold text-fg">
-            {MERCHANT_LABELS[marchand]}
+            {merchantLabel(marchand)}
           </span>
         </p>
 

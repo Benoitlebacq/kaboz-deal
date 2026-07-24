@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { products, type Section, type Marchand } from "@/db/schema";
+import { products, type Section } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
 import { sectionToPath } from "@/lib/constants";
@@ -61,7 +61,7 @@ export async function saveProduct(
   const id = String(formData.get("id") ?? "").trim();
   const titre = String(formData.get("titre") ?? "").trim();
   const section = String(formData.get("section") ?? "") as Section;
-  const marchand = String(formData.get("marchand") ?? "") as Marchand;
+  const marchand = String(formData.get("marchand") ?? "").trim();
   const lienAffilie = String(formData.get("lienAffilie") ?? "").trim();
   const slugInput = String(formData.get("slug") ?? "").trim();
   const sousCategorie =
@@ -79,8 +79,7 @@ export async function saveProduct(
   if (!titre) return { error: "Le titre est obligatoire." };
   if (section !== "tech" && section !== "jeux_video")
     return { error: "Section invalide." };
-  if (!["amazon", "eneba", "instant_gaming"].includes(marchand))
-    return { error: "Marchand invalide." };
+  if (!marchand) return { error: "Le marchand est obligatoire." };
   if (!lienAffilie)
     return { error: "Le lien d'affiliation est obligatoire." };
   try {

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { buttonClasses } from "@/components/ui/Button";
 import { getAllProductsAdmin } from "@/lib/queries";
 import { getDb } from "@/db";
-import { MERCHANT_LABELS, SECTION_LABELS } from "@/lib/constants";
+import { merchantLabel, SECTION_LABELS } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -63,7 +63,7 @@ export default async function AdminDashboard() {
                     {SECTION_LABELS[p.section]}
                   </td>
                   <td className="px-4 py-3 text-muted">
-                    {MERCHANT_LABELS[p.marchand]}
+                    {merchantLabel(p.marchand)}
                   </td>
                   <td className="px-4 py-3">
                     {formatPrice(p.prix, p.devise) ?? "—"}
