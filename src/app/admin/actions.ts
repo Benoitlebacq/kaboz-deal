@@ -7,7 +7,7 @@ import { getDb } from "@/db";
 import { products, type Section } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
-import { sectionToPath } from "@/lib/constants";
+import { sectionToPath, withInstantGamingAffiliate } from "@/lib/constants";
 
 /** Garde-fou : exige une session Supabase (en plus du middleware). */
 async function requireUser() {
@@ -87,6 +87,11 @@ export async function saveProduct(
   } catch {
     return { error: "Le lien d'affiliation n'est pas une URL valide." };
   }
+  // Instant Gaming : concatène le suffixe d'affiliation à la publication.
+  const finalLien =
+    marchand === "instant_gaming"
+      ? withInstantGamingAffiliate(lienAffilie)
+      : lienAffilie;
   if (imageUrl) {
     try {
       new URL(imageUrl);
@@ -118,7 +123,7 @@ export async function saveProduct(
     titre,
     section,
     marchand,
-    lienAffilie,
+    lienAffilie: finalLien,
     sousCategorie,
     imageUrl,
     description,

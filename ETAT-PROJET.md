@@ -160,6 +160,12 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 
 > Ajouter une entrée datée à chaque session marquante (plus récent en haut).
 
+### 2026-07-22 — Suffixe d'affiliation Instant Gaming
+- Variable `INSTANT_GAMING_AFFILIATE_URL` (= `?igr=gamer-353aecb`) + helper
+  `withInstantGamingAffiliate` dans `constants.ts`.
+- À l'enregistrement, si marchand = `instant_gaming`, le suffixe est concaténé à
+  l'URL (idempotent ; gère `?` déjà présent en `&`). Utilisé tel quel par `/go/[id]`.
+
 ### 2026-07-22 — Expiration par défaut à J+15
 - Nouvelle offre : `date_fin` pré-remplie à publication + 15 jours (form admin),
   modifiable / vidable. Filet serveur : à la **création**, si vide → +15 jours.

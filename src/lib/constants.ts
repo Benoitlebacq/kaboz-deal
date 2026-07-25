@@ -40,3 +40,18 @@ export const MERCHANTS: { value: Marchand; label: string }[] = [
   { value: "eneba", label: "Eneba" },
   { value: "instant_gaming", label: "Instant Gaming" },
 ];
+
+/** Suffixe d'affiliation Instant Gaming, concaténé à l'URL à la publication. */
+export const INSTANT_GAMING_AFFILIATE_URL = "?igr=gamer-353aecb";
+
+/**
+ * Ajoute le suffixe d'affiliation Instant Gaming à une URL.
+ * - idempotent (n'ajoute pas deux fois),
+ * - gère le cas où l'URL a déjà des paramètres (`?` -> `&`).
+ */
+export function withInstantGamingAffiliate(url: string): string {
+  const param = INSTANT_GAMING_AFFILIATE_URL.replace(/^\?/, ""); // igr=gamer-353aecb
+  if (url.includes(param)) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  return url + INSTANT_GAMING_AFFILIATE_URL.replace(/^\?/, separator);
+}
