@@ -49,15 +49,15 @@ export default function RootLayout({
       className={`${inter.variable} ${spaceGrotesk.variable} ${orbitron.variable}`}
       suppressHydrationWarning
     >
-      <body className="flex min-h-dvh flex-col">
-        <ThemeProvider
-          attribute="data-theme"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          {children}
-        </ThemeProvider>
+      <body className="flex min-h-dvh flex-col" suppressHydrationWarning>
+        {/* Anti-flash : applique le thème depuis localStorage avant le rendu.
+            Rendu côté serveur (composant serveur) -> pas d'avertissement React. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem('theme');document.documentElement.dataset.theme=(t==='light'||t==='dark')?t:'dark'}catch(e){document.documentElement.dataset.theme='dark'}`,
+          }}
+        />
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

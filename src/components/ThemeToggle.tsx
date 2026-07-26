@@ -1,34 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import { Moon, Sun } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
 
-/** Toggle clair/sombre (icône soleil/lune). Évite le mismatch d'hydratation. */
+const btnClass =
+  "inline-flex size-10 items-center justify-center rounded-full border border-border bg-surface text-fg transition-colors hover:bg-surface-2";
+
+/** Toggle clair/sombre (icône soleil/lune). Rendu stable avant montage. */
 export function ThemeToggle() {
-  const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const { theme, mounted, setTheme } = useTheme();
 
-  useEffect(() => setMounted(true), []);
+  // Avant le montage : rendu identique au serveur (évite le mismatch).
+  if (!mounted) {
+    return (
+      <button type="button" aria-label="Changer de thème" className={btnClass}>
+        <Sun className="size-5 opacity-0" />
+      </button>
+    );
+  }
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = theme === "dark";
 
   return (
     <button
       type="button"
       aria-label={isDark ? "Passer en clair" : "Passer en sombre"}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="inline-flex size-10 items-center justify-center rounded-full border border-border bg-surface text-fg transition-colors hover:bg-surface-2"
+      className={btnClass}
     >
-      {mounted ? (
-        isDark ? (
-          <Sun className="size-5" />
-        ) : (
-          <Moon className="size-5" />
-        )
-      ) : (
-        <Sun className="size-5 opacity-0" />
-      )}
+      {isDark ? <Sun className="size-5" /> : <Moon className="size-5" />}
     </button>
   );
 }

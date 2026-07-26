@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { sql, eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { products } from "@/db/schema";
+import { products, events } from "@/db/schema";
 import { getProductById } from "@/lib/queries";
 
 /**
@@ -20,7 +20,7 @@ export async function GET(
     return NextResponse.redirect(new URL("/", _request.url), 302);
   }
 
-  // Incrément best-effort : ne doit jamais bloquer la redirection.
+  // Best-effort : compteur + log d'événement, ne doit jamais bloquer la redirection.
   try {
     const db = getDb();
     if (db) {
@@ -28,6 +28,12 @@ export async function GET(
         .update(products)
         .set({ clicks: sql`${products.clicks} + 1` })
         .where(eq(products.id, id));
+      await db.insert(events).values({
+        type: "click",
+        productId: id,
+        section: product.section,
+        marchand: product.marchand,
+      });
     }
   } catch {
     // on ignore et on redirige quand même

@@ -33,7 +33,8 @@ Hors périmètre du MVP : scraping, comparaison Keepa, descriptions auto par LLM
   changes, cf. `AGENTS.md`.
 - **Tailwind CSS v4** — config CSS-first (`@theme` dans `globals.css`), tokens
   en variables CSS.
-- **next-themes** — clair/sombre via `data-theme`, **sombre par défaut**.
+- **Thème maison** (contexte React) — clair/sombre via `data-theme` + localStorage,
+  **sombre par défaut** (script anti-flash serveur ; remplace next-themes).
 - **Drizzle ORM** + **postgres-js** — accès BDD typé.
 - **Supabase Auth** + **@supabase/ssr** — protège `/admin` uniquement.
 - **Inter** (corps) + **Space Grotesk** (titres) + **Orbitron** (logo néon) via
@@ -61,7 +62,8 @@ Champs : `id` (uuid), `slug` (unique), `titre`, `description`, `section`,
 `actif` (déf. true), `mis_en_avant` (déf. false), `clicks` (déf. 0),
 `created_at`.
 
-Schéma : `src/db/schema.ts` · Migrations : `drizzle/` (0000 init, 0001 marchand→texte).
+Table `events` (stats de clics). Schéma : `src/db/schema.ts` · Migrations :
+`drizzle/` (0000 init, 0001 marchand→texte, 0002 table events).
 Évolutions prévues : table `price_history`, `categories`.
 
 ## 5. Arborescence
@@ -76,6 +78,7 @@ src/
       [section]/[slug]/       fiche produit (metadata unique + JSON-LD Product)
     admin/                    backoffice protégé
       login/ · page.tsx       (liste) · produits/[id]/ (new = création)
+      stats/                  statistiques clics (KPIs, tendance, top deals)
       actions.ts              server actions : auth + CRUD + revalidatePath
     go/[id]/route.ts          redirection 302 lien affilié (+ compteur clics)
     sitemap.ts · robots.ts    SEO
@@ -177,6 +180,17 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 - Admin : select des marchands (défauts + existants en base via `getMerchants`)
   + champ « Ajouter » pour créer un marchand à la volée. Affichage via
   `merchantLabel` (libellé connu, sinon valeur telle quelle).
+
+### 2026-07-22 — Statistiques de clics + provider de thème maison
+- Table `events` (migration 0002) : chaque clic sur `/go/[id]` est loggé
+  (horodaté, produit/section/marchand), sans cookie ni PII.
+- Page `/admin/stats` (lib `lib/stats.ts`) : KPIs, courbe de tendance
+  (toggle Semaine/Mois), clics par section/marchand, effet « à la une », top 5.
+  Totaux all-time depuis `products.clicks` ; tendances depuis `events`.
+- Fix SQL : unité `date_trunc` inlinée en littéral (param non inférable).
+- Remplacement de **next-themes** par un provider maison (contexte) → supprime
+  l'avertissement React `<script>`. `ThemeToggle` : rendu stable avant montage.
+  `suppressHydrationWarning` sur `<body>` (attributs injectés par extensions).
 
 ### 2026-07-22 — Recherche fonctionnelle
 - Barre de recherche desktop (`SearchBar`) + recherche mobile (`MobileSearch`,

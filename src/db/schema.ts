@@ -7,6 +7,7 @@ import {
   integer,
   boolean,
   timestamp,
+  index,
 } from "drizzle-orm/pg-core";
 
 /**
@@ -54,3 +55,28 @@ export type Product = typeof products.$inferSelect;
 export type NewProduct = typeof products.$inferInsert;
 export type Section = (typeof sectionEnum.enumValues)[number];
 export type Marchand = string;
+
+/**
+ * Journal d'événements pour les statistiques (clics, et vues plus tard).
+ * Sans cookie ni donnée perso : on stocke seulement type + produit + contexte
+ * dénormalisé (section/marchand au moment de l'événement) + horodatage.
+ */
+export const events = pgTable(
+  "events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    type: text("type").notNull(), // 'click' (extensible : 'view'…)
+    productId: uuid("product_id").references(() => products.id, {
+      onDelete: "set null",
+    }),
+    section: text("section"),
+    marchand: text("marchand"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [index("events_created_at_idx").on(t.createdAt)],
+);
+
+export type Event = typeof events.$inferSelect;
+export type NewEvent = typeof events.$inferInsert;

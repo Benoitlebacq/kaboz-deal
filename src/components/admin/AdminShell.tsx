@@ -12,12 +12,26 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <LayoutDashboard className="size-5 text-primary" aria-hidden />
             Backoffice
           </Link>
-          <Link
-            href="/"
-            className="text-sm text-muted transition-colors hover:text-fg"
-          >
-            Voir le site
-          </Link>
+          <nav className="flex items-center gap-3 text-sm">
+            <Link
+              href="/admin"
+              className="text-muted transition-colors hover:text-fg"
+            >
+              Produits
+            </Link>
+            <Link
+              href="/admin/stats"
+              className="text-muted transition-colors hover:text-fg"
+            >
+              Statistiques
+            </Link>
+            <Link
+              href="/"
+              className="text-muted transition-colors hover:text-fg"
+            >
+              Voir le site
+            </Link>
+          </nav>
           <form action={logout} className="ml-auto">
             <button
               type="submit"
