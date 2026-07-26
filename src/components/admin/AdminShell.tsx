@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LayoutDashboard, LogOut } from "lucide-react";
 import { logout } from "@/app/admin/actions";
+import { AdminNav } from "@/components/admin/AdminNav";
 
 /** Chrome du backoffice (barre + déconnexion) pour les pages authentifiées. */
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -12,26 +13,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             <LayoutDashboard className="size-5 text-primary" aria-hidden />
             Backoffice
           </Link>
-          <nav className="flex items-center gap-3 text-sm">
-            <Link
-              href="/admin"
-              className="text-muted transition-colors hover:text-fg"
-            >
-              Produits
-            </Link>
-            <Link
-              href="/admin/stats"
-              className="text-muted transition-colors hover:text-fg"
-            >
-              Statistiques
-            </Link>
-            <Link
-              href="/"
-              className="text-muted transition-colors hover:text-fg"
-            >
-              Voir le site
-            </Link>
-          </nav>
+          <AdminNav />
           <form action={logout} className="ml-auto">
             <button
               type="submit"
