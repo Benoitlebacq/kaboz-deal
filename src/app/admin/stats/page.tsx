@@ -7,6 +7,8 @@ import {
   getClickTrend,
   getCatalogStats,
   getAlerts,
+  getViewStats,
+  getViewTrend,
   type AlertItem,
 } from "@/lib/stats";
 import { getDb } from "@/db";
@@ -121,15 +123,19 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 export default async function StatsPage() {
   await requireUser();
   const dbReady = getDb() !== null;
-  const [stats, week, month, catalog, alerts] = await Promise.all([
-    getClickStats(),
-    getClickTrend("week"),
-    getClickTrend("month"),
-    getCatalogStats(),
-    getAlerts(),
-  ]);
+  const [stats, week, month, catalog, alerts, views, viewWeek, viewMonth] =
+    await Promise.all([
+      getClickStats(),
+      getClickTrend("week"),
+      getClickTrend("month"),
+      getCatalogStats(),
+      getAlerts(),
+      getViewStats(),
+      getViewTrend("week"),
+      getViewTrend("month"),
+    ]);
 
-  if (!dbReady || !stats || !catalog || !alerts) {
+  if (!dbReady || !stats || !catalog || !alerts || !views) {
     return (
       <AdminShell>
         <h1 className="mb-6 text-2xl font-bold">Statistiques</h1>
@@ -292,6 +298,65 @@ export default async function StatsPage() {
             empty="Aucun ✅"
           />
         </div>
+
+        {/* ========================== Audience ========================== */}
+        <SectionTitle>Audience</SectionTitle>
+
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3">
+          <Kpi label="Pages vues" value={views.totalViews} />
+          <Kpi label="Vues mobile" value={views.mobile} />
+          <Kpi label="Vues desktop" value={views.desktop} />
+        </div>
+
+        <TrendChart
+          week={viewWeek}
+          month={viewMonth}
+          title="Pages vues dans le temps"
+          unit="vue"
+        />
+
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="rounded-card border border-border bg-surface p-4">
+            <h3 className="mb-3 font-bold">Pages les plus vues</h3>
+            {views.topPages.length === 0 ? (
+              <p className="text-sm text-muted">Pas encore de vues.</p>
+            ) : (
+              <ul className="flex flex-col gap-2 text-sm">
+                {views.topPages.map((p) => (
+                  <li key={p.path} className="flex items-center gap-2">
+                    <Link
+                      href={p.path}
+                      className="flex-1 truncate hover:text-primary"
+                    >
+                      {p.path}
+                    </Link>
+                    <span className="font-semibold">{p.n}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div className="rounded-card border border-border bg-surface p-4">
+            <h3 className="mb-3 font-bold">Termes recherchés</h3>
+            {views.topSearches.length === 0 ? (
+              <p className="text-sm text-muted">Aucune recherche pour le moment.</p>
+            ) : (
+              <ul className="flex flex-col gap-2 text-sm">
+                {views.topSearches.map((s) => (
+                  <li key={s.q} className="flex items-center gap-2">
+                    <span className="flex-1 truncate">{s.q}</span>
+                    <span className="font-semibold">{s.n}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        <p className="text-xs text-muted">
+          Les vues comptent les pages affichées (pas les visiteurs uniques) —
+          sans cookie ni donnée perso.
+        </p>
       </div>
     </AdminShell>
   );

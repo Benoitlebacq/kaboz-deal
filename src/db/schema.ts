@@ -65,17 +65,22 @@ export const events = pgTable(
   "events",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    type: text("type").notNull(), // 'click' (extensible : 'view'…)
+    type: text("type").notNull(), // 'click' | 'view' | 'search'
     productId: uuid("product_id").references(() => products.id, {
       onDelete: "set null",
     }),
     section: text("section"),
     marchand: text("marchand"),
+    label: text("label"), // vue : chemin ; recherche : requête
+    device: text("device"), // 'mobile' | 'desktop'
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
-  (t) => [index("events_created_at_idx").on(t.createdAt)],
+  (t) => [
+    index("events_created_at_idx").on(t.createdAt),
+    index("events_type_idx").on(t.type),
+  ],
 );
 
 export type Event = typeof events.$inferSelect;

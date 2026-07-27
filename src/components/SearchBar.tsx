@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
+import { track } from "@/lib/track";
 
 /** Barre de recherche du header : soumet vers /recherche?q=… */
 export function SearchBar() {
@@ -12,7 +13,10 @@ export function SearchBar() {
   function onSubmit(e: FormEvent) {
     e.preventDefault();
     const query = q.trim();
-    if (query) router.push(`/recherche?q=${encodeURIComponent(query)}`);
+    if (query) {
+      track({ type: "search", q: query });
+      router.push(`/recherche?q=${encodeURIComponent(query)}`);
+    }
   }
 
   return (

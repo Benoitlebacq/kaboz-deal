@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { PriceBlock } from "@/components/PriceBlock";
 import { buttonClasses } from "@/components/ui/Button";
 import { merchantLabel, sectionToPath } from "@/lib/constants";
+import { imageUnoptimized } from "@/lib/domains";
 import { timeAgo, plainExcerpt } from "@/lib/utils";
 
 /**
@@ -28,6 +29,7 @@ export function DealCard({ product }: { product: Product }) {
             alt={product.titre}
             fill
             sizes="(max-width: 640px) 100vw, 160px"
+            unoptimized={imageUnoptimized(product.imageUrl)}
             className="object-contain p-2"
           />
         ) : (

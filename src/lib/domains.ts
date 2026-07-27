@@ -29,6 +29,26 @@ export const DEFAULT_IMAGE_DOMAINS = [
   "supabase.co",
 ];
 
+/**
+ * L'hôte fait-il partie des domaines « optimisables » (= la liste par défaut,
+ * qui alimente `remotePatterns` dans next.config) ? Les domaines ajoutés par
+ * l'admin n'y sont pas -> ils seront rendus `unoptimized` (chargement direct).
+ */
+export function isOptimizableHost(host: string): boolean {
+  const h = host.toLowerCase();
+  return DEFAULT_IMAGE_DOMAINS.some((d) => h === d || h.endsWith(`.${d}`));
+}
+
+/** Faut-il rendre l'image sans l'optimiseur Next ? (domaine hors remotePatterns) */
+export function imageUnoptimized(url: string | null | undefined): boolean {
+  if (!url) return false;
+  try {
+    return !isOptimizableHost(new URL(url).hostname);
+  } catch {
+    return true;
+  }
+}
+
 /** L'hôte est-il autorisé (exact ou sous-domaine) ? */
 export function hostAllowed(host: string, extras: string[] = []): boolean {
   const h = host.toLowerCase();

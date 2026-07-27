@@ -7,9 +7,13 @@ import { cn } from "@/lib/utils";
 export function TrendChart({
   week,
   month,
+  title = "Clics dans le temps",
+  unit = "clic",
 }: {
   week: TrendBucket[];
   month: TrendBucket[];
+  title?: string;
+  unit?: string;
 }) {
   const [period, setPeriod] = useState<"week" | "month">("week");
   const data = period === "week" ? week : month;
@@ -26,7 +30,7 @@ export function TrendChart({
   return (
     <div className="rounded-card border border-border bg-surface p-4">
       <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="font-bold">Clics dans le temps</h2>
+        <h2 className="font-bold">{title}</h2>
         <div className="inline-flex rounded-pill border border-border p-0.5 text-sm">
           {(["week", "month"] as const).map((p) => (
             <button
@@ -48,8 +52,7 @@ export function TrendChart({
 
       {data.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted">
-          Pas encore de données — les clics sont enregistrés à partir de
-          maintenant.
+          Pas encore de données — enregistrées à partir de maintenant.
         </p>
       ) : (
         <>
@@ -57,7 +60,7 @@ export function TrendChart({
             {data.map((d) => (
               <div
                 key={d.label}
-                title={`${d.clicks} clic${d.clicks > 1 ? "s" : ""}`}
+                title={`${d.clicks} ${unit}${d.clicks > 1 ? "s" : ""}`}
                 className="flex-1 rounded-t [background-image:var(--primary-gradient)]"
                 style={{ height: `${Math.max(2, (d.clicks / max) * 100)}%` }}
               />

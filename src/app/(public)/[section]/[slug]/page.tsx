@@ -14,6 +14,7 @@ import {
   sectionToPath,
 } from "@/lib/constants";
 import { formatDateLong, formatDateShort, timeAgo, toNumber } from "@/lib/utils";
+import { imageUnoptimized } from "@/lib/domains";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -130,6 +131,7 @@ export default async function ProductPage({ params }: { params: Params }) {
               alt={product.titre}
               fill
               sizes="(max-width: 640px) 100vw, 256px"
+              unoptimized={imageUnoptimized(product.imageUrl)}
               className="object-contain p-3"
               priority
             />

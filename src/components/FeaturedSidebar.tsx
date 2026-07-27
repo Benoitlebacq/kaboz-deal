@@ -4,6 +4,7 @@ import { ImageOff } from "lucide-react";
 import type { Product } from "@/db/schema";
 import { formatPrice, toNumber } from "@/lib/utils";
 import { sectionToPath } from "@/lib/constants";
+import { imageUnoptimized } from "@/lib/domains";
 
 /**
  * Sidebar "Bons plans à la une" (design-front §5.4).
@@ -32,6 +33,7 @@ export function FeaturedSidebar({ products }: { products: Product[] }) {
                       alt={p.titre}
                       fill
                       sizes="48px"
+                      unoptimized={imageUnoptimized(p.imageUrl)}
                       className="object-contain p-1"
                     />
                   ) : (

@@ -62,8 +62,10 @@ Champs : `id` (uuid), `slug` (unique), `titre`, `description`, `section`,
 `actif` (déf. true), `mis_en_avant` (déf. false), `clicks` (déf. 0),
 `created_at`.
 
-Table `events` (stats de clics). Schéma : `src/db/schema.ts` · Migrations :
-`drizzle/` (0000 init, 0001 marchand→texte, 0002 table events).
+Tables : `products`, `events` (stats : clics/vues/recherches — colonnes
+`type`/`label`/`device`/`section`), `allowed_domains` (allowlist images).
+Schéma : `src/db/schema.ts` · Migrations `drizzle/` : 0000 init · 0001
+marchand→texte · 0002 events · 0003 allowed_domains · 0004 events label/device.
 Évolutions prévues : table `price_history`, `categories`.
 
 ## 5. Arborescence
@@ -153,7 +155,9 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 
 ### 🔭 Prochaines pistes
 - Domaine perso `kaboz-deal.com` (Cloudflare) branché sur Vercel.
-- Autres groupes de stats (catalogue & qualité, alertes, audience/recherche).
+- Points sécurité restants : n°5 (schéma d'URL affilié `http/https` + rate-limit
+  `/go` et `/api/track`).
+- Visiteurs uniques (Plausible/Vercel) en complément des pages vues.
 - Descriptions auto par LLM ; cron vérif prix/dispo (Amazon Creators API, Keepa) ;
   table `price_history` + graphes d'évolution.
 
@@ -180,6 +184,19 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 - Admin : select des marchands (défauts + existants en base via `getMerchants`)
   + champ « Ajouter » pour créer un marchand à la volée. Affichage via
   `merchantLabel` (libellé connu, sinon valeur telle quelle).
+
+### 2026-07-22 — Stats (catalogue / alertes / audience) + sécurité images
+- **Stats admin** enrichies : Catalogue & qualité (KPIs, remise moyenne, deals
+  sans image/desc/prix, répartitions) ; Alertes (expire <3j, expiré mais actif,
+  0 clic) ; Audience (tracker `/api/track` → events `view`/`search`, tendance
+  vues semaine/mois, top pages, device, termes recherchés). Pages vues (pas de
+  visiteurs uniques), sans cookie ni PII.
+- **Sécurité images (point n°3)** : proxy `/_next/image` fermé — optimisation
+  restreinte aux domaines connus via `remotePatterns` (hybride : domaines
+  ajoutés en admin rendus `unoptimized`). Allowlist `allowed_domains` gérée
+  depuis `/admin/domaines` + validation du domaine image à l'enregistrement
+  (`src/lib/domains.ts`).
+- Migrations 0003 (allowed_domains) & 0004 (events label/device).
 
 ### 2026-07-22 — Filtres & tri (Tech / Jeux vidéo)
 - Barre de filtres sur `/tech` et `/jeux-video` : **sous-catégorie**, **marchand**,

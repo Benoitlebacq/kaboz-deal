@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, X } from "lucide-react";
+import { track } from "@/lib/track";
 
 /**
  * Recherche mobile : bouton loupe (visible < sm) qui déplie un champ pleine
@@ -17,6 +18,7 @@ export function MobileSearch() {
     e.preventDefault();
     const query = q.trim();
     if (query) {
+      track({ type: "search", q: query });
       setOpen(false);
       router.push(`/recherche?q=${encodeURIComponent(query)}`);
     }

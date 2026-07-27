@@ -1,4 +1,5 @@
 import { Header } from "@/components/Header";
+import { Tracker } from "@/components/Tracker";
 
 /* Icônes de marque en SVG, aux couleurs officielles des plateformes. */
 function YoutubeIcon({ className }: { className?: string }) {
@@ -24,6 +25,7 @@ export default function PublicLayout({
 }) {
   return (
     <>
+      <Tracker />
       <Header />
       <main className="w-full flex-1">
         <div className="mx-auto w-full max-w-[1240px] px-4 py-6">{children}</div>

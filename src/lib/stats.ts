@@ -237,3 +237,76 @@ export async function getClickTrend(
 
   return rows;
 }
+
+// ================================ Audience ==================================
+
+export type ViewStats = {
+  totalViews: number;
+  mobile: number;
+  desktop: number;
+  topPages: { path: string; n: number }[];
+  topSearches: { q: string; n: number }[];
+};
+
+export async function getViewStats(): Promise<ViewStats | null> {
+  const db = getDb();
+  if (!db) return null;
+
+  const [t] = await db
+    .select({
+      totalViews: sql<number>`count(*) filter (where ${events.type} = 'view')::int`,
+      mobile: sql<number>`count(*) filter (where ${events.type} = 'view' and ${events.device} = 'mobile')::int`,
+      desktop: sql<number>`count(*) filter (where ${events.type} = 'view' and ${events.device} = 'desktop')::int`,
+    })
+    .from(events);
+
+  const topPages = await db
+    .select({ path: events.label, n: sql<number>`count(*)::int` })
+    .from(events)
+    .where(sql`${events.type} = 'view' and ${events.label} is not null`)
+    .groupBy(events.label)
+    .orderBy(desc(sql`count(*)`))
+    .limit(8);
+
+  const topSearches = await db
+    .select({ q: events.label, n: sql<number>`count(*)::int` })
+    .from(events)
+    .where(sql`${events.type} = 'search' and ${events.label} is not null`)
+    .groupBy(events.label)
+    .orderBy(desc(sql`count(*)`))
+    .limit(8);
+
+  return {
+    totalViews: t?.totalViews ?? 0,
+    mobile: t?.mobile ?? 0,
+    desktop: t?.desktop ?? 0,
+    topPages: topPages.map((r) => ({ path: r.path ?? "", n: r.n })),
+    topSearches: topSearches.map((r) => ({ q: r.q ?? "", n: r.n })),
+  };
+}
+
+/** Tendance des vues par semaine ou par mois (table events, type='view'). */
+export async function getViewTrend(
+  period: "week" | "month",
+): Promise<TrendBucket[]> {
+  const db = getDb();
+  if (!db) return [];
+  const unit = period === "week" ? sql.raw("'week'") : sql.raw("'month'");
+  const interval =
+    period === "week" ? sql`interval '8 weeks'` : sql`interval '6 months'`;
+  const bucket = sql`date_trunc(${unit}, ${events.createdAt})`;
+
+  const rows = await db
+    .select({
+      label: sql<string>`to_char(${bucket}, 'YYYY-MM-DD')`,
+      clicks: sql<number>`count(*)::int`,
+    })
+    .from(events)
+    .where(
+      sql`${events.type} = 'view' and ${events.createdAt} >= now() - ${interval}`,
+    )
+    .groupBy(bucket)
+    .orderBy(bucket);
+
+  return rows;
+}
