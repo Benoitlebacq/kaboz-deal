@@ -1,6 +1,12 @@
 import { and, desc, eq, ilike, or, sql, type SQL } from "drizzle-orm";
 import { getDb } from "@/db";
-import { products, type Product, type Section } from "@/db/schema";
+import {
+  products,
+  allowedDomains,
+  type Product,
+  type Section,
+  type AllowedDomain,
+} from "@/db/schema";
 
 export type ProductFilters = {
   cat?: string;
@@ -182,6 +188,13 @@ export async function getFilteredProducts(
     .from(products)
     .where(and(...conditions))
     .orderBy(orderBy);
+}
+
+/** Domaines d'images ajoutés depuis l'admin (extras, en plus des défauts code). */
+export async function getAllowedDomains(): Promise<AllowedDomain[]> {
+  const db = getDb();
+  if (!db) return [];
+  return db.select().from(allowedDomains).orderBy(allowedDomains.domain);
 }
 
 /** Admin : tous les produits, y compris inactifs. */

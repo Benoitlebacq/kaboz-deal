@@ -15,6 +15,11 @@ const links = [
     label: "Statistiques",
     isActive: (p: string) => p.startsWith("/admin/stats"),
   },
+  {
+    href: "/admin/domaines",
+    label: "Domaines",
+    isActive: (p: string) => p.startsWith("/admin/domaines"),
+  },
 ];
 
 /** Nav du backoffice avec surbrillance de la page active. */

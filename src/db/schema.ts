@@ -80,3 +80,18 @@ export const events = pgTable(
 
 export type Event = typeof events.$inferSelect;
 export type NewEvent = typeof events.$inferInsert;
+
+/**
+ * Domaines d'images autorisés (allowlist gérée depuis l'admin).
+ * L'URL image d'un produit est refusée à l'enregistrement si son hôte n'y
+ * correspond pas (correspondance exacte ou sous-domaine).
+ */
+export const allowedDomains = pgTable("allowed_domains", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  domain: text("domain").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export type AllowedDomain = typeof allowedDomains.$inferSelect;

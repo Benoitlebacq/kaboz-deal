@@ -4,9 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
-import { products, type Section } from "@/db/schema";
+import { products, allowedDomains, type Section } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
+import { getAllowedDomains } from "@/lib/queries";
+import { urlAllowed, normalizeDomain } from "@/lib/domains";
 import { slugify } from "@/lib/utils";
 import { sectionToPath, withInstantGamingAffiliate } from "@/lib/constants";
 
@@ -89,6 +91,13 @@ export async function saveProduct(
     } catch {
       return { error: "L'URL de l'image n'est pas valide." };
     }
+    const extras = (await getAllowedDomains()).map((d) => d.domain);
+    if (!urlAllowed(imageUrl, extras)) {
+      return {
+        error:
+          "Domaine de l'image non autorisé. Ajoute-le dans Admin → Domaines (ou utilise une image d'un domaine déjà autorisé).",
+      };
+    }
   }
 
   const slug = slugify(slugInput || titre);
@@ -156,4 +165,35 @@ export async function deleteProduct(formData: FormData) {
   revalidatePath("/tech");
   revalidatePath("/jeux-video");
   redirect("/admin");
+}
+
+// ==================== Allowlist des domaines d'images ====================
+
+export async function addAllowedDomain(formData: FormData) {
+  await requireUser();
+  const db = getDb();
+  if (!db) redirect("/admin/domaines");
+
+  const domain = normalizeDomain(String(formData.get("domain") ?? ""));
+  if (!domain) {
+    redirect(`/admin/domaines?error=${encodeURIComponent("Domaine invalide.")}`);
+  }
+  try {
+    await db.insert(allowedDomains).values({ domain }).onConflictDoNothing();
+  } catch {
+    // on ignore (doublon, etc.)
+  }
+  revalidatePath("/admin/domaines");
+  redirect("/admin/domaines");
+}
+
+export async function deleteAllowedDomain(formData: FormData) {
+  await requireUser();
+  const db = getDb();
+  if (!db) redirect("/admin/domaines");
+
+  const id = String(formData.get("id") ?? "");
+  await db.delete(allowedDomains).where(eq(allowedDomains.id, id));
+  revalidatePath("/admin/domaines");
+  redirect("/admin/domaines");
 }

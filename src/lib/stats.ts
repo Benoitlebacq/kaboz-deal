@@ -2,6 +2,119 @@ import { sql, and, eq, desc } from "drizzle-orm";
 import { getDb } from "@/db";
 import { products, events, type Section } from "@/db/schema";
 
+// ============================ Catalogue & qualité ============================
+
+export type CatalogStats = {
+  total: number;
+  actifs: number;
+  masques: number;
+  alaune: number;
+  remiseMoyenne: number;
+  sansImage: number;
+  sansDescription: number;
+  sansPrix: number;
+  parSection: { section: Section; n: number }[];
+  parMarchand: { marchand: string; n: number }[];
+};
+
+export async function getCatalogStats(): Promise<CatalogStats | null> {
+  const db = getDb();
+  if (!db) return null;
+
+  const [c] = await db
+    .select({
+      total: sql<number>`count(*)::int`,
+      actifs: sql<number>`count(*) filter (where ${products.actif})::int`,
+      masques: sql<number>`count(*) filter (where not ${products.actif})::int`,
+      alaune: sql<number>`count(*) filter (where ${products.actif} and ${products.misEnAvant})::int`,
+      sansImage: sql<number>`count(*) filter (where ${products.actif} and (${products.imageUrl} is null or ${products.imageUrl} = ''))::int`,
+      sansDescription: sql<number>`count(*) filter (where ${products.actif} and (${products.description} is null or ${products.description} = ''))::int`,
+      sansPrix: sql<number>`count(*) filter (where ${products.actif} and ${products.prix} is null)::int`,
+      remiseMoyenne: sql<number>`coalesce(avg((1 - ${products.prix} / ${products.prixBarre}) * 100) filter (where ${products.actif} and ${products.prixBarre} is not null and ${products.prix} is not null and ${products.prixBarre} > 0), 0)::float`,
+    })
+    .from(products);
+
+  const parSection = await db
+    .select({ section: products.section, n: sql<number>`count(*)::int` })
+    .from(products)
+    .where(eq(products.actif, true))
+    .groupBy(products.section)
+    .orderBy(desc(sql`count(*)`));
+
+  const parMarchand = await db
+    .select({ marchand: products.marchand, n: sql<number>`count(*)::int` })
+    .from(products)
+    .where(eq(products.actif, true))
+    .groupBy(products.marchand)
+    .orderBy(desc(sql`count(*)`));
+
+  return {
+    total: c?.total ?? 0,
+    actifs: c?.actifs ?? 0,
+    masques: c?.masques ?? 0,
+    alaune: c?.alaune ?? 0,
+    remiseMoyenne: c?.remiseMoyenne ?? 0,
+    sansImage: c?.sansImage ?? 0,
+    sansDescription: c?.sansDescription ?? 0,
+    sansPrix: c?.sansPrix ?? 0,
+    parSection,
+    parMarchand,
+  };
+}
+
+// ================================ Alertes ===================================
+
+export type AlertItem = {
+  id: string;
+  titre: string;
+  dateFin: Date | null;
+  clicks: number;
+};
+
+export type Alerts = {
+  expireBientot: AlertItem[];
+  expireMaisActif: AlertItem[];
+  zeroClics: AlertItem[];
+};
+
+export async function getAlerts(): Promise<Alerts | null> {
+  const db = getDb();
+  if (!db) return null;
+  const cols = {
+    id: products.id,
+    titre: products.titre,
+    dateFin: products.dateFin,
+    clicks: products.clicks,
+  };
+
+  const [expireBientot, expireMaisActif, zeroClics] = await Promise.all([
+    db
+      .select(cols)
+      .from(products)
+      .where(
+        sql`${products.actif} and ${products.dateFin} is not null and ${products.dateFin} between now() and now() + interval '3 days'`,
+      )
+      .orderBy(sql`${products.dateFin} asc`)
+      .limit(20),
+    db
+      .select(cols)
+      .from(products)
+      .where(
+        sql`${products.actif} and ${products.dateFin} is not null and ${products.dateFin} < now()`,
+      )
+      .orderBy(sql`${products.dateFin} desc`)
+      .limit(20),
+    db
+      .select(cols)
+      .from(products)
+      .where(and(eq(products.actif, true), eq(products.clicks, 0)))
+      .orderBy(desc(products.createdAt))
+      .limit(20),
+  ]);
+
+  return { expireBientot, expireMaisActif, zeroClics };
+}
+
 export type ClickStats = {
   totalClicks: number;
   activeCount: number;
