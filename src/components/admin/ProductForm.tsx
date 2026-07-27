@@ -33,9 +33,11 @@ const labelCls = "flex flex-col gap-1 text-sm font-medium";
 export function ProductForm({
   product,
   merchants = [],
+  subcategories = [],
 }: {
   product?: Product;
   merchants?: string[];
+  subcategories?: string[];
 }) {
   const isEdit = Boolean(product);
   const [state, formAction, pending] = useActionState<FormState, FormData>(
@@ -186,11 +188,17 @@ export function ProductForm({
           Sous-catégorie
           <input
             name="sousCategorie"
+            list="subcats-list"
             value={sousCategorie}
             onChange={(e) => setSousCategorie(e.target.value)}
             placeholder="écran, GPU, CPU…"
             className={field}
           />
+          <datalist id="subcats-list">
+            {subcategories.map((s) => (
+              <option key={s} value={s} />
+            ))}
+          </datalist>
         </label>
 
         <div className={labelCls}>

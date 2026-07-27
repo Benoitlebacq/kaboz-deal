@@ -153,7 +153,7 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 
 ### 🔭 Prochaines pistes
 - Domaine perso `kaboz-deal.com` (Cloudflare) branché sur Vercel.
-- Filtres & sous-catégories.
+- Autres groupes de stats (catalogue & qualité, alertes, audience/recherche).
 - Descriptions auto par LLM ; cron vérif prix/dispo (Amazon Creators API, Keepa) ;
   table `price_history` + graphes d'évolution.
 
@@ -180,6 +180,15 @@ L'admin **local** écrit dans la même base mais ne rafraîchit que le cache loc
 - Admin : select des marchands (défauts + existants en base via `getMerchants`)
   + champ « Ajouter » pour créer un marchand à la volée. Affichage via
   `merchantLabel` (libellé connu, sinon valeur telle quelle).
+
+### 2026-07-22 — Filtres & tri (Tech / Jeux vidéo)
+- Barre de filtres sur `/tech` et `/jeux-video` : **sous-catégorie**, **marchand**,
+  **tri** (récents / prix ↑↓ / remise / populaires), **toggle promo ≥ -50 %**.
+- Via l'URL (`?cat=…&marchand=…&tri=…&promo=1`), filtrage/tri **côté serveur** ;
+  chips actifs + réinitialiser ; bouton « Filtrer » repliable en mobile.
+- Admin : **autocomplétion** de la sous-catégorie (datalist des valeurs en base).
+- Composant `Filters` ; requêtes `getFilteredProducts` / `getFilterOptions` /
+  `getSubcategories`.
 
 ### 2026-07-22 — Statistiques de clics + provider de thème maison
 - Table `events` (migration 0002) : chaque clic sur `/go/[id]` est loggé
