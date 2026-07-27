@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ProductForm } from "@/components/admin/ProductForm";
 import { getProductById, getMerchants, getSubcategories } from "@/lib/queries";
+import { requireUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: "Édition produit",
@@ -18,6 +19,7 @@ export default async function ProductEditPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireUser();
   const { id } = await params;
   const isNew = id === "new";
 

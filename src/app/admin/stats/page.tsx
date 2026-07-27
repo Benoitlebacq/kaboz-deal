@@ -4,6 +4,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { TrendChart } from "@/components/admin/TrendChart";
 import { getClickStats, getClickTrend } from "@/lib/stats";
 import { getDb } from "@/db";
+import { requireUser } from "@/lib/auth";
 import { SECTION_LABELS, merchantLabel } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -51,6 +52,7 @@ function BarList({
 }
 
 export default async function StatsPage() {
+  await requireUser();
   const dbReady = getDb() !== null;
   const [stats, week, month] = await Promise.all([
     getClickStats(),

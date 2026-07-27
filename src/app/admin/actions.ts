@@ -6,18 +6,9 @@ import { eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { products, type Section } from "@/db/schema";
 import { createClient } from "@/lib/supabase/server";
+import { requireUser } from "@/lib/auth";
 import { slugify } from "@/lib/utils";
 import { sectionToPath, withInstantGamingAffiliate } from "@/lib/constants";
-
-/** Garde-fou : exige une session Supabase (en plus du middleware). */
-async function requireUser() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
-  return user;
-}
 
 export async function login(formData: FormData) {
   const email = String(formData.get("email") ?? "");

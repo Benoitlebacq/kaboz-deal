@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { buttonClasses } from "@/components/ui/Button";
 import { getAllProductsAdmin } from "@/lib/queries";
 import { getDb } from "@/db";
+import { requireUser } from "@/lib/auth";
 import { merchantLabel, SECTION_LABELS } from "@/lib/constants";
 import { formatPrice } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
+  await requireUser();
   const dbReady = getDb() !== null;
   const products = await getAllProductsAdmin();
 
